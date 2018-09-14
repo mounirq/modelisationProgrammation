@@ -1,3 +1,5 @@
+#ifndef OPTION_H
+#define OPTION_H
 #pragma once
 
 #include "pnl/pnl_vector.h"
@@ -19,6 +21,20 @@ public:
      * @return phi(trajectoire)
      */
     virtual double payoff(const PnlMat *path) = 0;
+
+    /* Constructeur par défaut
+     * */
+    Option();
+
+    /* Constructeur avec paramètres
+    * */
+    Option(double T_, int nbTimeSteps_, int size_);
+
+    /* Constructeur par copie
+    * */
+    Option(const Option & option);
+
+    /* Destructeur abstrait */
+    virtual ~Option();
 };
-
-
+#endif
