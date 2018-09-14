@@ -39,3 +39,4 @@ src/pnl
 
 # Builds of clion
 cmake-build-debug/
+.idea
