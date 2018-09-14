@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.0)
-project(mc-pricer CXX)
+project(ProjetPricerGit)
 
 # Prefix
 if (NOT PREFIX)
@@ -49,6 +49,10 @@ target_link_libraries(test-parser jl_parser ${LIBS})
 
 add_executable(mc-example src/mc_example.cpp)
 target_link_libraries(mc-example jl_parser ${LIBS})
+
+# Compile the SRC
+set(SOURCES src/MonteCarlo.cpp)
+add_library(prng ${SOURCES})
 
 # Print compiler flags
 get_directory_property(DirDefs COMPILE_DEFINITIONS)
