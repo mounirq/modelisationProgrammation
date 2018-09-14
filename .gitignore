@@ -36,3 +36,6 @@ build
 
 # Library pnl
 src/pnl
+
+# Builds of clion
+cmake-build-debug/
