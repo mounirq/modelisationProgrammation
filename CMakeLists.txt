@@ -70,7 +70,7 @@ target_link_libraries(mc-example jl_parser ${LIBS})
 
 add_subdirectory(test)
 
-add_executable(test_optionBasket src/test_optionBasket.cpp)
+add_executable(test_optionBasket src/test_basketOption.cpp)
 target_link_libraries(test_optionBasket prng ${LIBS})
 
 
