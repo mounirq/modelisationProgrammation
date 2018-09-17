@@ -44,7 +44,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 add_subdirectory(src/3rdparty/jlparser)
 
 # Compile the SRC
-set(SOURCES src/BlackScholesModel.cpp src/MonteCarlo.cpp)
+set(SOURCES src/BlackScholesModel.cpp src/MonteCarlo.cpp src/Option.cpp src/OptionBasket.cpp)
 add_library(prng ${SOURCES})
 
 # Test the parser
@@ -61,6 +61,10 @@ target_link_libraries(mc-price-0 jl_parser ${LIBS})
 
 add_executable(test_blackScholesModel src/test_blackScholesModel.cpp)
 target_link_libraries(test_blackScholesModel prng ${LIBS})
+
+add_executable(test_optionBasket src/option_example.cpp)
+target_link_libraries(test_optionBasket prng ${LIBS})
+
 
 
 # Print compiler flags
