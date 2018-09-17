@@ -12,7 +12,7 @@ OptionAsian::OptionAsian():Option(){
 
 OptionAsian::OptionAsian(double T, int nbTimeSteps, int size, double strike, PnlVect *weights):Option(T,nbTimeSteps,size){
     strike_ = strike;
-    weights = pnl_vect_copy(weights);
+    weights_ = pnl_vect_copy(weights);
 }
 
 OptionAsian::OptionAsian(const OptionAsian &optionAsian):Option(optionAsian.T_,optionAsian.nbTimeSteps_,optionAsian.size_){

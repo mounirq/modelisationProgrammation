@@ -11,7 +11,7 @@ OptionBasket::OptionBasket():Option(){
 
 OptionBasket::OptionBasket(double T, int nbTimeSteps, int size, double strike, PnlVect *weights):Option(T,nbTimeSteps,size){
     strike_ = strike;
-    weights = pnl_vect_copy(weights);
+    weights_ = pnl_vect_copy(weights);
 }
 
 OptionBasket::OptionBasket(const OptionBasket &optionBasket):Option(optionBasket.T_,optionBasket.nbTimeSteps_,optionBasket.size_){

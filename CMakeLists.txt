@@ -70,16 +70,9 @@ target_link_libraries(mc-example jl_parser ${LIBS})
 
 add_subdirectory(test)
 
-#Test de price en t=0
-#add_executable(mc-price-0 test/test_mc.cpp)
-#target_link_libraries(mc-price-0 jl_parser ${LIBS})
+add_executable(test_optionBasket src/test_optionBasket.cpp)
+target_link_libraries(test_optionBasket prng ${LIBS})
 
-
-#add_executable(test_blackScholesModel test/test_blackScholesModel.cpp)
-#target_link_libraries(test_blackScholesModel prng ${LIBS})
-
-#add_executable(test_optionBasket src/option_example.cpp)
-#target_link_libraries(test_optionBasket prng ${LIBS})
 
 
 
