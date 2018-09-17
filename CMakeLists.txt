@@ -44,8 +44,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 add_subdirectory(src/3rdparty/jlparser)
 
 # Compile the SRC
-set(SOURCES src/BlackScholesModel.cpp)
-set(SOURCES src/MonteCarlo.cpp)
+set(SOURCES src/BlackScholesModel.cpp src/MonteCarlo.cpp)
 add_library(prng ${SOURCES})
 
 # Test the parser

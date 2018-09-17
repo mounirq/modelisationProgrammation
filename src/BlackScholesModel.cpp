@@ -74,9 +74,9 @@ void BlackScholesModel::asset(PnlMat *path, double T, int nbTimeSteps, PnlRng *r
 	{
 		pnl_mat_set(corrMat, i, i, 1);
 	}
-	pnl_mat_print(corrMat);
+	//pnl_mat_print(corrMat);
 	int result = pnl_mat_chol(corrMat);
-	pnl_mat_print(corrMat);
+	//pnl_mat_print(corrMat);
 
 	PnlMat * gaussMat = pnl_mat_create(nbTimeSteps, size_);
 	pnl_mat_rng_normal(gaussMat, nbTimeSteps , size_, rng);
@@ -104,6 +104,39 @@ void BlackScholesModel::asset(PnlMat *path, double T, int nbTimeSteps, PnlRng *r
 	//pnl_vect_print(previousSpots);
 	//pnl_mat_print(path);
 
+}
+
+void BlackScholesModel::asset(PnlMat *path, double t, double T, int nbTimeSteps, PnlRng *rng, const PnlMat *past)
+{
+	int sizePast = past->m;
+	PnlVect * previousSpots = pnl_vect_copy(spot_);
+	PnlVect * vectTmp = pnl_vect_create(size_);
+	for (int i=0; i<sizePast; i++)
+	{
+		pnl_mat_get_row(vectTmp, past, i);
+		pnl_mat_set_row(path, vectTmp, i);
+		previousSpots = pnl_vect_copy(vectTmp);
+	}
+
+	double timeVariation = T/nbTimeSteps;
+	PnlMat * corrMat = pnl_mat_create_from_scalar(size_, size_, rho_); // Create a PnlMat where all the elements = rho_
+	// Now we change all diag elements to 1
+	for(int i=0; i<size_; i++)
+	{
+		pnl_mat_set(corrMat, i, i, 1);
+	}
+	int result = pnl_mat_chol(corrMat);
+	PnlMat * gaussMat = pnl_mat_create(nbTimeSteps-sizePast+1, size_);
+	pnl_mat_rng_normal(gaussMat, nbTimeSteps-sizePast+1 , size_, rng);
+	PnlVect * lineGauss = pnl_vect_create(size_);
+
+	for (int i=sizePast; i<nbTimeSteps+1; i++)
+	{
+		pnl_mat_get_row(lineGauss, gaussMat, i-sizePast);
+		vectTmp = computeVect(size_, previousSpots, r_, sigma_, timeVariation, corrMat, lineGauss);
+		pnl_mat_set_row(path, vectTmp, i);
+		previousSpots = pnl_vect_copy(vectTmp);
+	}
 }
 
 
