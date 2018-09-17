@@ -43,6 +43,10 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 add_subdirectory(src/3rdparty/jlparser)
 
+# Compile the SRC
+set(SOURCES src/BlackScholesModel.cpp)
+add_library(prng ${SOURCES})
+
 # Test the parser
 add_executable(test-parser src/test_parser.cpp)
 target_link_libraries(test-parser jl_parser ${LIBS})
@@ -50,9 +54,10 @@ target_link_libraries(test-parser jl_parser ${LIBS})
 add_executable(mc-example src/mc_example.cpp)
 target_link_libraries(mc-example jl_parser ${LIBS})
 
-# Compile the SRC
-set(SOURCES src/MonteCarlo.cpp)
-add_library(prng ${SOURCES})
+add_executable(test_blackScholesModel src/test_blackScholesModel.cpp)
+target_link_libraries(test_blackScholesModel prng ${LIBS})
+
+
 
 # Print compiler flags
 get_directory_property(DirDefs COMPILE_DEFINITIONS)

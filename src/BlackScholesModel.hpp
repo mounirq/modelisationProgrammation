@@ -53,6 +53,16 @@ public:
      */
     void shiftAsset(PnlMat *shift_path, const PnlMat *path, int d, double h, double t, double timestep);
 
+    BlackScholesModel();
+
+    BlackScholesModel(int size, double r, double rho, PnlVect *sigma, PnlVect *spot);
+
+    BlackScholesModel(const BlackScholesModel & blackScholesModel);
+
+    ~BlackScholesModel();
+
 };
+
+PnlVect * computeVect(int size, PnlVect * previousSpots, double r, PnlVect *sigma, double variation, PnlVect * upperChol, PnlVect * guassVect);
 
 
