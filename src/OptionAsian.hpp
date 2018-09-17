@@ -12,5 +12,9 @@ public:
     PnlVect *weights;
     double strike;
 
+    ~OptionAsian();
+    OptionAsian();
+    OptionAsian(double T_, int nbTimeSteps_, int size_, double strike, PnlVect *weights);
+    OptionAsian(const OptionAsian & optionAsian);
 };
 #endif

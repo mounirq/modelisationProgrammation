@@ -1,10 +1,6 @@
 #include "Option.hpp"
 
-Option::Option(){
-	T_=0;
-	size_=0;
-	nbTimeSteps_=0;
-}
+Option::~Option(){}
 
 Option::Option(double T, int nbTimeSteps, int size){
 	T_ = T;
@@ -17,4 +13,3 @@ Option::Option(const Option & option){
 	nbTimeSteps_ = option.nbTimeSteps_;
 		size_= option.size_;
 }
-

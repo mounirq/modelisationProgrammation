@@ -9,13 +9,13 @@
 class OptionBasket : public Option
 {
 public:
-    PnlVect *weights;
-    double strike;
+    PnlVect *weights_;
+    double strike_;
 
     ~OptionBasket();
 
     OptionBasket();
-    Optionbasket(double T_, int nbTimeSteps_, int size_, double strike, PnlVect *weights);
-
+    OptionBasket(double T_, int nbTimeSteps_, int size_, double strike, PnlVect *weights);
+    OptionBasket(const OptionBasket &optionBasket);
 };
 #endif

@@ -1,32 +1,39 @@
-//#pragma once
-//
-//#include "pnl/pnl_random.h"
-//#include "pnl/pnl_vector.h"
-//#include "pnl/pnl_matrix.h"
-//
-///// \brief Classe Option abstraite
-//class OptionAsian : public Option
-//{
-//public:
-//    double T_; /// maturité
-//    int nbTimeSteps_; /// nombre de pas de temps de discrétisation
-//    int size_; /// dimension du modèle, redondant avec BlackScholesModel::size_
-//    PnlVect *weights;
-//    double strike;
-//
-//
-//    /**
-//     * Calcule la valeur du payoff sur la trajectoire
-//     *
-//     * @param[in] path est une matrice de taille (N+1) x d
-//     * contenant une trajectoire du modèle telle que créée
-//     * par la fonction asset.
-//     * @return phi(trajectoire)
-//     */
-//    virtual double payoff(const PnlMat *path){
-//    	PnlVect *vect ;
-//    	pnl_mat_sum_vect(vect, path, 'r');
-//    	return pnl_vect_scalar_prod(vect, weights)/(nbTimeSteps_+1)- strike;
-//
-//    }
-//};
+#include "OptionAsian.hpp"
+
+OptionAsian::~OptionAsian(){
+    pnl_vect_free(&weights_);
+}
+
+
+OptionAsian::OptionAsian():Option(){
+    weights_ = pnl_vect_new();
+    strike_ = 0;
+}
+
+OptionAsian::OptionAsian(double T, int nbTimeSteps, int size, double strike, PnlVect *weights):Option(T,nbTimeSteps,size){
+    strike_ = strike;
+    weights = pnl_vect_copy(const & weights);
+}
+
+OptionAsian::OptionAsian(const OptionAsian &OptionAsian):Option(T,nbTimeSteps,size){
+    strike_ = OptionAsian.strike_;
+    weights_ = pnl_vect_copy(const & OptionAsian.weights)
+}
+
+double OptionAsian::payoff(const PnlMat *path) {
+    double sum = 0;
+    double lambda = 0;
+    PnlVect * pnlVect = pnl_vect_create(nbTimeSteps_ + 1);
+    for(int i = 0 ; i < size_, i++){
+        lambda = GET(weights_,i);
+        pnl_mat_get_col(pnlVect, path,i);
+        pnl_vect_mult_scalar(pnlVect, lambda);
+        sum += pnl_vect_sum(pnlVect);
+    }
+    PnlVect * pnlVect = pnl_vect_create(size_);
+    int lastRow = nbTimeSteps_ + 1 - 1;
+    pnl_mat_get_row(pnlVect, path, lastRow);
+    double productScalar = pnl_vect_scalar_prod(const pnlVect, const weights_);
+    double payOffReturned = (productScalar - strike_ > 0) ? (productScalar - strike_) : 0;
+    return payOffReturned;
+}
