@@ -13,7 +13,13 @@ public:
     double fdStep_; /*! pas de différence finie */
     int nbSamples_; /*! nombre de tirages Monte Carlo */
 
-    /**
+    MonteCarlo();
+
+    MonteCarlo(BlackScholesModel *mod_, Option *opt_, PnlRng *rng_, double fdStep_, int nbSamples_);
+
+    MonteCarlo(const MonteCarlo &MC);
+
+/**
      * Calcule le prix de l'option à la date 0
      *
      * @param[out] prix valeur de l'estimateur Monte Carlo
@@ -43,6 +49,11 @@ public:
      * de confiance sur le calcul du delta
      */
     void delta(const PnlMat *past, double t, PnlVect *delta);
+
+    virtual ~MonteCarlo();
+
+    bool operator==(const MonteCarlo &rhs) const;
+
 };
 
 

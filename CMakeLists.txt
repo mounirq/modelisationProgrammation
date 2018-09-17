@@ -50,8 +50,12 @@ target_link_libraries(test-parser jl_parser ${LIBS})
 add_executable(mc-example src/mc_example.cpp)
 target_link_libraries(mc-example jl_parser ${LIBS})
 
+#Test de price en t=0
+add_executable(mc-price-0 test/test_mc.cpp)
+target_link_libraries(mc-price-0 jl_parser ${LIBS})
+
 # Compile the SRC
-set(SOURCES src/MonteCarlo.cpp)
+set(SOURCES src/MonteCarlo.cpp test/test_mc.cpp)
 add_library(prng ${SOURCES})
 
 # Print compiler flags
