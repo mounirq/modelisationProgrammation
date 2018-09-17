@@ -62,7 +62,7 @@ target_link_libraries(mc-price-0 jl_parser ${LIBS})
 add_executable(test_blackScholesModel src/test_blackScholesModel.cpp)
 target_link_libraries(test_blackScholesModel prng ${LIBS})
 
-add_executable(test_optionBasket src/option_example.cpp)
+add_executable(test_optionBasket src/test_optionBasket.cpp)
 target_link_libraries(test_optionBasket prng ${LIBS})
 
 
