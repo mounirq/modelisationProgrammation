@@ -17,5 +17,6 @@ public:
     OptionBasket();
     OptionBasket(double T_, int nbTimeSteps_, int size_, double strike, PnlVect *weights);
     OptionBasket(const OptionBasket &optionBasket);
+    double payoff(const PnlMat *path);
 };
 #endif
