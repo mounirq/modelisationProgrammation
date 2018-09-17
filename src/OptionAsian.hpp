@@ -9,12 +9,13 @@
 class OptionAsian : public Option
 {
 public:
-    PnlVect *weights;
-    double strike;
+    PnlVect *weights_;
+    double strike_;
 
     ~OptionAsian();
     OptionAsian();
     OptionAsian(double T_, int nbTimeSteps_, int size_, double strike, PnlVect *weights);
     OptionAsian(const OptionAsian & optionAsian);
+    double payoff(const PnlMat *path);
 };
 #endif

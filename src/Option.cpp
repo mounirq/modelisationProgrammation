@@ -11,5 +11,5 @@ Option::Option(double T, int nbTimeSteps, int size){
 Option::Option(const Option & option){
 	T_ = option.T_;
 	nbTimeSteps_ = option.nbTimeSteps_;
-		size_= option.size_;
+	size_= option.size_;
 }
