@@ -45,6 +45,7 @@ add_subdirectory(src/3rdparty/jlparser)
 
 # Compile the SRC
 set(SOURCES src/BlackScholesModel.cpp)
+set(SOURCES src/MonteCarlo.cpp)
 add_library(prng ${SOURCES})
 
 # Test the parser
@@ -58,9 +59,6 @@ target_link_libraries(mc-example jl_parser ${LIBS})
 add_executable(mc-price-0 test/test_mc.cpp)
 target_link_libraries(mc-price-0 jl_parser ${LIBS})
 
-# Compile the SRC
-#set(SOURCES src/MonteCarlo.cpp test/test_mc.cpp)
-#add_library(prng ${SOURCES})
 
 add_executable(test_blackScholesModel src/test_blackScholesModel.cpp)
 target_link_libraries(test_blackScholesModel prng ${LIBS})
