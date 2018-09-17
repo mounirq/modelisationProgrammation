@@ -37,6 +37,20 @@ endif()
 # Add math lib
 set(LIBS ${LIBS} m)
 
+enable_testing ()
+# Télécharge googletest au moment de la configureation
+configure_file(CMakeLists.txt.in
+               googletest-download/CMakeLists.txt)
+execute_process(COMMAND ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}" .
+  WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/googletest-download )
+execute_process(COMMAND ${CMAKE_COMMAND} --build .
+  WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/googletest-download )
+
+# Ajout googletest directement au moment de la compilation
+add_subdirectory(${CMAKE_BINARY_DIR}/googletest-src)
+
+
+
 # Add jlparser
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -54,16 +68,18 @@ target_link_libraries(test-parser jl_parser ${LIBS})
 add_executable(mc-example src/mc_example.cpp)
 target_link_libraries(mc-example jl_parser ${LIBS})
 
+add_subdirectory(test)
+
 #Test de price en t=0
-add_executable(mc-price-0 test/test_mc.cpp)
-target_link_libraries(mc-price-0 jl_parser ${LIBS})
+#add_executable(mc-price-0 test/test_mc.cpp)
+#target_link_libraries(mc-price-0 jl_parser ${LIBS})
 
 
-add_executable(test_blackScholesModel src/test_blackScholesModel.cpp)
-target_link_libraries(test_blackScholesModel prng ${LIBS})
+#add_executable(test_blackScholesModel test/test_blackScholesModel.cpp)
+#target_link_libraries(test_blackScholesModel prng ${LIBS})
 
-add_executable(test_optionBasket src/option_example.cpp)
-target_link_libraries(test_optionBasket prng ${LIBS})
+#add_executable(test_optionBasket src/option_example.cpp)
+#target_link_libraries(test_optionBasket prng ${LIBS})
 
 
 

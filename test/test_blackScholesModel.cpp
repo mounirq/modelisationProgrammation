@@ -1,6 +1,6 @@
 #include <iostream>
 #include <string>
-#include "BlackScholesModel.hpp"
+#include "../src/BlackScholesModel.hpp"
 #include "pnl/pnl_random.h"
 #include "pnl/pnl_vector.h"
 #include "pnl/pnl_matrix.h"
@@ -10,7 +10,7 @@ using namespace std;
 int main(int argc, char **argv)
 {
 	cout<<"Début\n";
-	int nbTimeSteps = 10;
+	int nbTimeSteps = 5;
 	int nbUnderlyings = 2;
 	double maturity = 2;
 
