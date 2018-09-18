@@ -7,16 +7,13 @@ PerformanceOption::~PerformanceOption(){
 
 PerformanceOption::PerformanceOption():Option(){
     weights_ = pnl_vect_new();
-    strike_ = 0;
 }
 
-PerformanceOption::PerformanceOption(double T, int nbTimeSteps, int size, double strike, PnlVect *weights):Option(T,nbTimeSteps,size){
-    strike_ = strike;
+PerformanceOption::PerformanceOption(double T, int nbTimeSteps, int size, PnlVect *weights):Option(T,nbTimeSteps,size){
     weights_ = pnl_vect_copy(weights);
 }
 
 PerformanceOption::PerformanceOption(const PerformanceOption &performanceOption):Option(performanceOption.T_,performanceOption.nbTimeSteps_,performanceOption.size_){
-    strike_ = performanceOption.strike_;
     weights_ = pnl_vect_copy(performanceOption.weights_);
 }
 
