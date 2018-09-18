@@ -10,15 +10,11 @@ class PerformanceOption : public Option
 {
 public:
     PnlVect *weights_;
-    double strike_;
 
     ~PerformanceOption();
     PerformanceOption();
-    PerformanceOption(double T_, int nbTimeSteps_, int size_, double strike, PnlVect *weights);
+    PerformanceOption(double T_, int nbTimeSteps_, int size_, PnlVect *weights);
     PerformanceOption(const PerformanceOption & optionPerformance);
     double payoff(const PnlMat *path);
-
-
-
 };
 #endif
