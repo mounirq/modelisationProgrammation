@@ -21,15 +21,8 @@ AsianOption::AsianOption(const AsianOption &asianOption):Option(asianOption.T_,a
 }
 
 double AsianOption::payoff(const PnlMat *path) {
-    double sum = 0;
-    double lambda = 0;
-    PnlVect * pnlVect = pnl_vect_create(nbTimeSteps_ + 1);
-    for(int i = 0 ; i < size_; i++){
-        lambda = GET(weights_,i);
-        pnl_mat_get_col(pnlVect, path,i);
-        pnl_vect_mult_scalar(pnlVect, lambda);
-        sum += pnl_vect_sum(pnlVect);
-    }
+    PnlVect * pnlVect = pnl_mat_mult_vect(path, weights_);
+    double sum = pnl_vect_sum(pnlVect);
     sum /= (nbTimeSteps_ + 1);
     double payOffReturned = (sum - strike_ > 0) ? (sum - strike_) : 0;
     return payOffReturned;
