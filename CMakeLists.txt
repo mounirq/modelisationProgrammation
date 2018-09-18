@@ -58,7 +58,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 add_subdirectory(src/3rdparty/jlparser)
 
 # Compile the SRC
-set(SOURCES src/BlackScholesModel.cpp src/MonteCarlo.cpp src/Option.cpp src/OptionBasket.cpp src/OptionAsian.cpp)
+set(SOURCES src/BlackScholesModel.cpp src/MonteCarlo.cpp src/Option.cpp src/BasketOption.cpp src/AsianOption.cpp)
 add_library(prng ${SOURCES})
 
 # Test the parser

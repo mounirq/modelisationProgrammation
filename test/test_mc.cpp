@@ -2,7 +2,7 @@
 #include <string>
 #include <pnl/pnl_vector.h>
 #include <pnl/pnl_random.h>
-#include "../src/OptionBasket.hpp"
+#include "../src/BasketOption.hpp"
 #include "../src/BlackScholesModel.hpp"
 
 using namespace std;
@@ -16,7 +16,7 @@ int main(int argc, char **argv)
 //    double pricingDate = 1;
 //    int nbTimeSteps = 4;
 //    int size = 4;
-//    OptionBasket *myBasket = new OptionBasket(maturity-pricingDate,nbSteps,size,strike,basketWeights);
+//    BasketOption *myBasket = new BasketOption(maturity-pricingDate,nbSteps,size,strike,basketWeights);
 //    Basket *myBasket2 = new Basket(maturity,nbSteps,size,strike,basketWeights);
 //    double intresetRate = 0.04879;
 //    double rho = 0.0;

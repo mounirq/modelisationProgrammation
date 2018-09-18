@@ -1,12 +1,12 @@
 #include <iostream>
-#include "OptionBasket.hpp"
+#include "BasketOption.hpp"
 
 using namespace std;
 
 int main()
 {
     PnlVect * weights = pnl_vect_create_from_list(2, 0.3, 0.7);
-    OptionBasket optionBasket = OptionBasket(2, 2, 2, 12, weights);
+    BasketOption basketOption = BasketOption(2, 2, 2, 12, weights);
     int nbUnderlyings = 2;
     PnlMat * past = pnl_mat_create(3, nbUnderlyings);
     pnl_mat_set(past, 0, 0, 10);
@@ -15,7 +15,7 @@ int main()
     pnl_mat_set(past, 1, 1, 15.169634);
     pnl_mat_set(past, 2, 0, 10.263704);
     pnl_mat_set(past, 2, 1, 15.039295);
-    double payOffReturned = optionBasket.payoff(past);
+    double payOffReturned = basketOption.payoff(past);
 
     cout<<"The Payoff of the Basket Option has to be equal to 1.60662 and is : " << payOffReturned;
     return 0;
