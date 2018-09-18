@@ -34,6 +34,8 @@ public:
     * */
     Option(const Option & option);
 
+
+
     /* Destructeur abstrait */
     virtual ~Option();
 };
