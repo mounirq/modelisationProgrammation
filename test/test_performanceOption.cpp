@@ -21,6 +21,6 @@ int main()
     pnl_mat_set(past, 4, 0, 2);
     pnl_mat_set(past, 4, 1, 2);
     double payOffReturned = optionPerformance.payoff(past);
-    cout<<"The Payoff of the Performance Option has to be equal to 1.5 and is : " << payOffReturned;
+    cout<<"The Payoff of the Performance Option has to be equal to 2 and is : " << payOffReturned;
     return 0;
 }
