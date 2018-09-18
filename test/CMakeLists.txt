@@ -11,6 +11,9 @@ target_link_libraries(test_basketOption prng ${LIBS})
 add_executable(test_asianOption test_asianOption.cpp)
 target_link_libraries(test_asianOption prng ${LIBS})
 
+add_executable(test_performanceOption test_performanceOption.cpp)
+target_link_libraries(test_performanceOption prng ${LIBS})
+
 
 add_executable(test_blackScholesModel test_blackScholesModel.cpp)
 target_link_libraries(test_blackScholesModel prng ${LIBS})
