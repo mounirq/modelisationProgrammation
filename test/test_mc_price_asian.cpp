@@ -2,7 +2,7 @@
 #include <string>
 #include <pnl/pnl_vector.h>
 #include <pnl/pnl_random.h>
-#include "../src/OptionAsian.hpp"
+#include "../src/AsianOption.hpp"
 #include "../src/BlackScholesModel.hpp"
 #include "../src/MonteCarlo.hpp"
 
@@ -19,7 +19,7 @@ int main(int argc, char **argv)
     double rho = 0.0;
     PnlVect* weights = pnl_vect_create_from_scalar(2,0.5);
     int nbTimeSteps = 150;
-    OptionAsian *asianOption = new OptionAsian(maturity, nbTimeSteps, size, strike, weights);
+    AsianOption *asianOption = new AsianOption(maturity, nbTimeSteps, size, strike, weights);
 
     BlackScholesModel *bs = new BlackScholesModel(size, intrestRate, rho, volatilities, initialSpots);
 

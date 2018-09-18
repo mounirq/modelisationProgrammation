@@ -2,7 +2,7 @@
 #include <string>
 #include <pnl/pnl_vector.h>
 #include <pnl/pnl_random.h>
-#include "../src/OptionBasket.hpp"
+#include "../src/BasketOption.hpp"
 #include "../src/BlackScholesModel.hpp"
 #include "../src/MonteCarlo.hpp"
 
@@ -19,7 +19,7 @@ int main(int argc, char **argv)
     double rho = 0.0;
     PnlVect* weights = pnl_vect_create_from_scalar(40,0.025);
     int nbTimeSteps = 1;
-    OptionBasket *optionBasket = new OptionBasket(maturity, nbTimeSteps, size, strike, weights);
+    BasketOption *optionBasket = new BasketOption(maturity, nbTimeSteps, size, strike, weights);
 
     BlackScholesModel *bs = new BlackScholesModel(size, intrestRate, rho, volatilities, initialSpots);
 
