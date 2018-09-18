@@ -32,8 +32,8 @@ BlackScholesModel::BlackScholesModel(const BlackScholesModel & blackScholesModel
 
 BlackScholesModel::~BlackScholesModel()
 {
-	delete sigma_;
-	delete spot_;
+	pnl_vect_free(&sigma_);
+	pnl_vect_free(&spot_);
 }
 
 PnlVect * computeVect(int size, PnlVect * previousSpots, double r, PnlVect *sigma, double variation, PnlMat * cholMat, PnlVect * gaussVect)
