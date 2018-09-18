@@ -57,24 +57,10 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 add_subdirectory(src/3rdparty/jlparser)
 
-# Compile the SRC
-set(SOURCES src/BlackScholesModel.cpp src/MonteCarlo.cpp src/Option.cpp src/BasketOption.cpp src/AsianOption.cpp)
-add_library(prng ${SOURCES})
-
-# Test the parser
-add_executable(test-parser src/test_parser.cpp)
-target_link_libraries(test-parser jl_parser ${LIBS})
-
-add_executable(mc-example src/mc_example.cpp)
-target_link_libraries(mc-example jl_parser ${LIBS})
-
+add_subdirectory(src)
 add_subdirectory(test)
 
-add_executable(test_basketOption src/test_basketOption.cpp)
-target_link_libraries(test_basketOption prng ${LIBS})
-
-add_executable(test_asianOption src/test_asianOption.cpp)
-target_link_libraries(test_asianOption prng ${LIBS})
+# Test the parser
 
 
 # Print compiler flags

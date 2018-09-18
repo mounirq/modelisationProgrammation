@@ -108,34 +108,50 @@ void BlackScholesModel::asset(PnlMat *path, double T, int nbTimeSteps, PnlRng *r
 
 void BlackScholesModel::asset(PnlMat *path, double t, double T, int nbTimeSteps, PnlRng *rng, const PnlMat *past)
 {
+	double timeI1 = 0;
+	double timeI = 0;
+	double timeVariation = T/nbTimeSteps;
 	int sizePast = past->m;
 	PnlVect * previousSpots = pnl_vect_copy(spot_);
 	PnlVect * vectTmp = pnl_vect_create(size_);
-	for (int i=0; i<sizePast; i++)
+
+	pnl_mat_set_row(path, spot_, 0); // Copy the initial spots
+
+	// Start with i=1, because the initial spots have already been copied
+	for (int i=1; i<sizePast-1; i++)
 	{
+		timeI = timeI + timeVariation;
 		pnl_mat_get_row(vectTmp, past, i);
 		pnl_mat_set_row(path, vectTmp, i);
 		previousSpots = pnl_vect_copy(vectTmp);
 	}
+	// I copy the last row of Past, which represents the spots at t
+	pnl_mat_get_row(vectTmp, past, sizePast-1);
+	previousSpots = pnl_vect_copy(vectTmp);
+	timeI1 = timeI + timeVariation;
+	timeI = t;
 
-	double timeVariation = T/nbTimeSteps;
 	PnlMat * corrMat = pnl_mat_create_from_scalar(size_, size_, rho_); // Create a PnlMat where all the elements = rho_
 	// Now we change all diag elements to 1
 	for(int i=0; i<size_; i++)
 	{
 		pnl_mat_set(corrMat, i, i, 1);
 	}
-	int result = pnl_mat_chol(corrMat);
-	PnlMat * gaussMat = pnl_mat_create(nbTimeSteps-sizePast+1, size_);
-	pnl_mat_rng_normal(gaussMat, nbTimeSteps-sizePast+1 , size_, rng);
-	PnlVect * lineGauss = pnl_vect_create(size_);
 
-	for (int i=sizePast; i<nbTimeSteps+1; i++)
+	int result = pnl_mat_chol(corrMat);
+	PnlMat * gaussMat = pnl_mat_create(nbTimeSteps-(sizePast-1)+1, size_);
+	pnl_mat_rng_normal(gaussMat, nbTimeSteps-(sizePast-1)+1 , size_, rng);
+	PnlVect * lineGauss = pnl_vect_create(size_);
+	int beginning = (sizePast-1 > 1)? sizePast-1 : 1 ;
+	for (int i=beginning; i<nbTimeSteps+1; i++)
 	{
-		pnl_mat_get_row(lineGauss, gaussMat, i-sizePast);
+		timeVariation = timeI1 - timeI;
+		pnl_mat_get_row(lineGauss, gaussMat, i-(sizePast-1));
 		vectTmp = computeVect(size_, previousSpots, r_, sigma_, timeVariation, corrMat, lineGauss);
 		pnl_mat_set_row(path, vectTmp, i);
 		previousSpots = pnl_vect_copy(vectTmp);
+		timeI = timeI1;
+		timeI1 = timeI1 + T/nbTimeSteps;
 	}
 }
 
