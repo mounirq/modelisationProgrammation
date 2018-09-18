@@ -19,6 +19,7 @@ public:
 
     MonteCarlo(const MonteCarlo &MC);
 
+    MonteCarlo(char *fileName);
 /**
      * Calcule le prix de l'option à la date 0
      *
