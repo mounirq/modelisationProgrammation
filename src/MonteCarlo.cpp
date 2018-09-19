@@ -16,8 +16,7 @@ MonteCarlo::MonteCarlo(char *fileName)
     double rho;
     PnlVect *sigma, *spot;
 
-    P->extract("sample number", size1);
-    nbSamples_ = (int) size1;
+    P->extract("sample number", this->nbSamples_);
     P->extract("option size", size);
     P->extract("interest rate", r);
     P->extract("correlation", rho);
@@ -34,6 +33,9 @@ MonteCarlo::MonteCarlo(char *fileName)
     P->extract("maturity", T);
     P->extract("timestep number", nbTimeSteps);
     P->extract("payoff coefficients", weights, size);
+    rng_ = pnl_rng_create(PNL_RNG_MERSENNE);
+
+    pnl_rng_sseed(rng_, time(NULL));
 
     //decommenter les lignes commentees si l'option performance marche
 
@@ -58,7 +60,7 @@ MonteCarlo::MonteCarlo(char *fileName)
     }
 }
 
-MonteCarlo::MonteCarlo(BlackScholesModel *mod, Option *opt, PnlRng *rng, double fdStep, int nbSamples)
+MonteCarlo::MonteCarlo(BlackScholesModel *mod, Option *opt, PnlRng *rng, double fdStep, size_t nbSamples)
 {
     mod_ = mod;
     opt_ = opt;
