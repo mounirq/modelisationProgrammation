@@ -63,6 +63,8 @@ PnlVect * computeVect(int size, PnlVect * previousSpots, double r, PnlVect *sigm
 		pnl_vect_set(vect, i, result);
 
 	}
+	//Free
+	pnl_vect_free(&lineChol);
 	return vect;
 
 }
@@ -103,8 +105,12 @@ void BlackScholesModel::asset(PnlMat *path, double T, int nbTimeSteps, PnlRng *r
 		previousSpots = pnl_vect_copy(vectTmp);
 
 	}
-	//pnl_vect_print(previousSpots);
-	//pnl_mat_print(path);
+	//Free
+	pnl_mat_free(&corrMat);
+	pnl_mat_free(&gaussMat);
+	pnl_vect_free(&vectTmp);
+	pnl_vect_free(&previousSpots);
+	pnl_vect_free(&lineGauss);
 
 }
 
@@ -163,6 +169,42 @@ void BlackScholesModel::asset(PnlMat *path, double t, double T, int nbTimeSteps,
 		timeI = timeI1;
 		timeI1 = timeI1 + T/nbTimeSteps;
 	}
+	//Free
+	pnl_vect_free(&previousSpots);
+	pnl_vect_free(&vectTmp);
+	pnl_mat_free(&corrMat);
+	pnl_mat_free(&gaussMat);
+	pnl_vect_free(&lineGauss);
+}
+
+void BlackScholesModel::shiftAsset(PnlMat *shift_path, const PnlMat *path, int d, double h, double t, double timestep)
+{
+	int index = 0;
+	int sizeMat = path->m;
+	double timeI = 0;
+	PnlVect * vectTmp = pnl_vect_create(size_);
+
+	// Copy the lines of path to shift_path where tI < t and without being outrange
+	while (timeI < t && index<sizeMat)
+	{
+		pnl_mat_get_row(vectTmp, path, index);
+		pnl_mat_set_row(shift_path, vectTmp, index);
+		index += 1;
+		timeI += timestep;
+
+	}
+	double valueBeforeShift = 0;
+
+	// Shift the column for the underlying number d, and starting with the line index
+	for(int i=index; i<sizeMat; i++)
+	{
+		pnl_mat_get_row(vectTmp, path, i);
+		valueBeforeShift = pnl_vect_get(vectTmp, d);
+		pnl_vect_set(vectTmp, d, valueBeforeShift*(1+h));
+		pnl_mat_set_row(shift_path, vectTmp, i);
+	}
+	//Free
+	pnl_vect_free(&vectTmp);
 }
 
 
