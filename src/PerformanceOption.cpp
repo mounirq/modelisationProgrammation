@@ -1,4 +1,6 @@
 #include "PerformanceOption.hpp"
+#include <iostream>
+using namespace std;
 
 PerformanceOption::~PerformanceOption(){
     pnl_vect_free(&weights_);
@@ -18,15 +20,19 @@ PerformanceOption::PerformanceOption(const PerformanceOption &performanceOption)
 }
 
 double PerformanceOption::payoff(const PnlMat *path) {
-    PnlVect *vect ;
-    PnlVect *tmp1;
-    PnlVect *tmp2;
-    vect = pnl_mat_mult_vect(path, weights_);
-    tmp1 = pnl_vect_create_subvect(vect, 1, nbTimeSteps_);
-    pnl_vect_extract_subvect(tmp2, vect, 0,nbTimeSteps_-1);
-    pnl_vect_div_vect_term(tmp1, tmp2);
-    pnl_vect_minus_scalar(tmp1, 1);
-    double sum = pnl_vect_sum(tmp1);
-    double payoffReturned = (sum > 0) ? sum : 0 ;
+    PnlVect * vect = pnl_mat_mult_vect(path, weights_);
+    PnlVect *vectTmp1 = pnl_vect_create_subvect(vect, 1, nbTimeSteps_);
+    PnlVect *vectTmp2 = pnl_vect_create(nbTimeSteps_);;
+    pnl_vect_extract_subvect(vectTmp2, vect, 0,nbTimeSteps_);
+    pnl_vect_div_vect_term(vectTmp1, vectTmp2);
+    pnl_vect_minus_scalar(vectTmp1, 1);
+    double maximumValue;
+    double tmpValue;
+    for(int i = 0; i < nbTimeSteps_; i++ ){
+        tmpValue = GET(vectTmp1, i);
+        maximumValue = (tmpValue > 0) ? tmpValue : 0;
+        LET(vectTmp1, i) = maximumValue;
+    }
+    double payoffReturned = pnl_vect_sum(vectTmp1);
     return payoffReturned+1;
 }

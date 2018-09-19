@@ -10,7 +10,7 @@ using namespace std;
 int main(int argc, char **argv)
 {
 	cout<<"Début\n";
-	int nbTimeSteps = 5;
+	int nbTimeSteps = 10;
 	int nbUnderlyings = 2;
 	double maturity = 2;
 
@@ -24,7 +24,7 @@ int main(int argc, char **argv)
 	PnlMat * path = pnl_mat_create(nbTimeSteps + 1, nbUnderlyings);
 	PnlRng * rng = pnl_rng_create(1);
 	pnl_rng_sseed(rng, time(NULL));
-	model.asset(path, maturity, nbTimeSteps, rng);
+	//model.asset(path, maturity, nbTimeSteps, rng);
 	//pnl_mat_print(path);
 	//pnl_vect_print(sigma);
 	//pnl_vect_print_asrow(sigma);
@@ -37,7 +37,7 @@ int main(int argc, char **argv)
 	pnl_mat_set(past, 2, 0, 10.263704);
 	pnl_mat_set(past, 2, 1, 15.039295);
 	//pnl_mat_print(past);
-	//model.asset(path, 1, maturity, nbTimeSteps, rng, past);
+	model.asset(path, 0.3, maturity, nbTimeSteps, rng, past);
 	pnl_mat_print(path);
 
 	cout<<"Fin\n";
