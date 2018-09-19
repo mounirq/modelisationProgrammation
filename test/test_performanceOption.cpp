@@ -5,7 +5,7 @@ using namespace std;
 
 int main()
 {
-    PnlVect * weights = pnl_vect_create_from_list(2, 0.5, 0.5);
+    PnlVect * weights = pnl_vect_create_from_list(2,0.5, 0.5);
     PerformanceOption optionPerformance  = PerformanceOption(2, 4, 2, weights);
     int nbUnderlyings = 2;
     PnlMat * past = pnl_mat_create(5, nbUnderlyings);
