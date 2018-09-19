@@ -29,20 +29,19 @@ int main(int argc, char **argv)
 
     double prix1;
     double ic1;
-//    double prix2;
-//    double ic2;
 
     int nbSamples = 50000;
 
-    //PnlMat* past = pnl_mat_create_from_scalar(1,40,100.0);
     MonteCarlo *mc = new MonteCarlo(bs, optionBasket, rng, 0.01, nbSamples);
-//    MonteCarlo *mc2 = new MonteCarlo(bsm,myBasket2,rng,0.1,nbSamples);
-//    mc2->price(past,pricingDate,prix2,ic2);
+
+    //construire MonteCarlo a partir du nom de fichier : cet appel compile mais ne marche pas
+    MonteCarlo *mc1 = new MonteCarlo((char *)"../data/basket.dat");
+
     mc->price(prix1,ic1);
     cout << "Le prix à t=0 est : " << prix1 << endl;
-//    cout << prix2 << endl;
+
     cout << "La largeur de l'intervalle de confiance est : " << ic1 << endl;
-//    cout << ic2 << endl;
+
 
     exit(0);
 }
