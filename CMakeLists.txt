@@ -60,7 +60,8 @@ add_subdirectory(src/3rdparty/jlparser)
 add_subdirectory(src)
 add_subdirectory(test)
 
-# Test the parser
+# Tests
+add_test (NAME BlackScholesModel COMMAND test_class_BlackScholesModel)
 
 
 # Print compiler flags

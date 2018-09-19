@@ -1,4 +1,6 @@
 #include "BlackScholesModel.hpp"
+#include <stdexcept>
+#include <iostream>
 
 
 BlackScholesModel::BlackScholesModel()
@@ -30,8 +32,8 @@ BlackScholesModel::BlackScholesModel(const BlackScholesModel & blackScholesModel
 
 BlackScholesModel::~BlackScholesModel()
 {
-	delete sigma_;
-	delete spot_;
+	pnl_vect_free(&sigma_);
+	pnl_vect_free(&spot_);
 }
 
 PnlVect * computeVect(int size, PnlVect * previousSpots, double r, PnlVect *sigma, double variation, PnlMat * cholMat, PnlVect * gaussVect)
@@ -108,10 +110,18 @@ void BlackScholesModel::asset(PnlMat *path, double T, int nbTimeSteps, PnlRng *r
 
 void BlackScholesModel::asset(PnlMat *path, double t, double T, int nbTimeSteps, PnlRng *rng, const PnlMat *past)
 {
+	int sizePast = past->m;
+	int numberOfExpectedElements = ceil(t*nbTimeSteps/T) + 1;
+	if (numberOfExpectedElements != sizePast)
+	{
+
+		std::cerr<<"\nERROR: size of Past doesn't fit the time t\nSizePast = "<<sizePast<<"\tnumberOfExpectedElements = "<<numberOfExpectedElements<<"\n";
+		throw;
+	}
+
 	double timeI1 = 0;
 	double timeI = 0;
 	double timeVariation = T/nbTimeSteps;
-	int sizePast = past->m;
 	PnlVect * previousSpots = pnl_vect_copy(spot_);
 	PnlVect * vectTmp = pnl_vect_create(size_);
 

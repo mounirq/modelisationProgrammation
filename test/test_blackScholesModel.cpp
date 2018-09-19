@@ -29,15 +29,15 @@ int main(int argc, char **argv)
 	//pnl_vect_print(sigma);
 	//pnl_vect_print_asrow(sigma);
 
-	PnlMat * past = pnl_mat_create(1, nbUnderlyings);
+	PnlMat * past = pnl_mat_create(3, nbUnderlyings);
 	pnl_mat_set(past, 0, 0, 10);
 	pnl_mat_set(past, 0, 1, 15);
-	//pnl_mat_set(past, 1, 0, 10.292682);
-	//pnl_mat_set(past, 1, 1, 15.169634);
-	//pnl_mat_set(past, 2, 0, 10.263704);
-	//pnl_mat_set(past, 2, 1, 15.039295);
+	pnl_mat_set(past, 1, 0, 10.292682);
+	pnl_mat_set(past, 1, 1, 15.169634);
+	pnl_mat_set(past, 2, 0, 10.263704);
+	pnl_mat_set(past, 2, 1, 15.039295);
 	//pnl_mat_print(past);
-	model.asset(path, 0, maturity, nbTimeSteps, rng, past);
+	model.asset(path, 0.3, maturity, nbTimeSteps, rng, past);
 	pnl_mat_print(path);
 
 	cout<<"Fin\n";

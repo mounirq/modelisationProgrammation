@@ -1,43 +1,61 @@
 #include <iostream>
 #include <string>
 #include "MonteCarlo.hpp"
+#include "3rdparty/jlparser/include/jlparser/parser.hpp"
+#include "BasketOption.hpp"
+#include "AsianOption.hpp"
+#include "PerformanceOption.hpp"
 
+MonteCarlo::MonteCarlo(char *fileName)
+{
+    Param *P = new Parser(fileName);
 
+    P->extract("sample number", this->nbSamples_);
 
+    int size;
+    double r;
+    double rho;
+    PnlVect *sigma, *spot;
 
-/** Constructeur par défaut */
-//MonteCarlo::MonteCarlo() {
-//    mod_ = new BlackScholesModel();
-//    opt_ = new Option();
-//    rng_ = pnl_rng_new();
-//    fdStep_ = 0;
-//    nbSamples_ = 0;
-//}
+    P->extract("option size", size);
+    P->extract("interest rate", r);
+    P->extract("correlation", rho);
+    P->extract("volatility", sigma, size);
+    P->extract("spot", spot, size);
+    this->mod_ = new BlackScholesModel(size, r, rho, sigma, spot);
 
-//MonteCarlo::MonteCarlo(char *fileName)
-//{
-//    Param *P = new Parser(fileName);
-//
-//    P->extract("sample number", this->nbSamples_);
-//
-//    int size;
-//    double r;
-//    double rho;
-//    PnlVect *sigma, *spot;
-//
-//    P->extract("option size", size);
-//    P->extract("interest rate", r);
-//    P->extract("correlation", rho);
-//    P->extract("volatility", sigma, size);
-//    P->extract("spot", spot, size);
-//    this->mod_ = new BlackScholesModel(size, r, rho, sigma, spot);
-//
-//    double T, strike;
-//    int nbTimeSteps_;
-//    PnlVect *weights_;
-////    string type;
-//
-//}
+    double T;
+    int nbTimeSteps;
+    PnlVect *weights;
+    std::string optionType;
+    P->extract("option type", optionType);
+
+    P->extract("maturity", T);
+    P->extract("timestep number", nbTimeSteps);
+    P->extract("payoff coefficients", weights, size);
+
+    //decommenter les lignes commentees si l'option performance marche
+
+//    if (optionType.compare("performance") == 0 )
+//    {
+//        this->opt_ = new PerformanceOption(T, nbTimeSteps, size, weights);
+//    }
+//    else {
+        double strike;
+        P->extract("strike", strike);
+        if (optionType.compare("basket") == 0 )
+        {
+            this->opt_ = new BasketOption(T, nbTimeSteps, size, strike, weights);
+        }
+        else if (optionType.compare("asian") == 0 )
+        {
+            this->opt_ = new AsianOption(T, nbTimeSteps, size, strike, weights);
+        }
+        else {
+            std::cerr << "Unkonwn option type" << std::endl;
+        }
+//    }
+}
 
 MonteCarlo::MonteCarlo(BlackScholesModel *mod, Option *opt, PnlRng *rng, double fdStep, int nbSamples)
 {
@@ -47,15 +65,6 @@ MonteCarlo::MonteCarlo(BlackScholesModel *mod, Option *opt, PnlRng *rng, double 
     fdStep_ = fdStep;
     nbSamples_ = nbSamples;
 }
-
-/** Constructeur par recopie */
-MonteCarlo::MonteCarlo(const MonteCarlo &MC)
-{
-    mod_ = new BlackScholesModel(*(MC.mod_));
-
-    //opt_ = new Option(*(MC.opt_));
-};
-
 
 MonteCarlo::~MonteCarlo() {
     free(mod_);
