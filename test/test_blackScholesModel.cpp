@@ -10,9 +10,9 @@ using namespace std;
 int main(int argc, char **argv)
 {
 	cout<<"Début\n";
-	int nbTimeSteps = 10;
+	int nbTimeSteps = 5;
 	int nbUnderlyings = 2;
-	double maturity = 2;
+	double maturity = 1;
 
 	PnlVect * sigma = pnl_vect_create(nbUnderlyings);
 	PnlVect * spot = pnl_vect_create(nbUnderlyings);
@@ -39,7 +39,10 @@ int main(int argc, char **argv)
 	//pnl_mat_print(past);
 	model.asset(path, 0.3, maturity, nbTimeSteps, rng, past);
 	pnl_mat_print(path);
-
+	PnlMat * shift_path = pnl_mat_create(nbTimeSteps+1, nbUnderlyings);
+	cout<<"--------------\n";
+	model.shiftAsset(shift_path, path, 0, 1, 20, maturity/nbTimeSteps);
+	pnl_mat_print(shift_path);
 	cout<<"Fin\n";
     exit(0);
 }
