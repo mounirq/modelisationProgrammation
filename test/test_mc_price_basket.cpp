@@ -35,7 +35,7 @@ int main(int argc, char **argv)
     MonteCarlo *mc = new MonteCarlo(bs, optionBasket, rng, 0.01, nbSamples);
 
     //construire MonteCarlo a partir du nom de fichier : cet appel compile mais ne marche pas
-    MonteCarlo *mc1 = new MonteCarlo((char *)"../../data/basket.dat");
+    MonteCarlo *mc1 = new MonteCarlo((char *)"../../data/basket_1.dat");
 
 //    mc->price(prix1,ic1);
     mc1->price(prix1,ic1);
@@ -43,6 +43,10 @@ int main(int argc, char **argv)
 
     cout << "La largeur de l'intervalle de confiance est : " << ic1 << endl;
 
+    PnlVect * delta = pnl_vect_create(size);
+    PnlMat * past = pnl_mat_new();
+    mc1->delta(past, 0, delta);
+    pnl_vect_print(delta);
 
     exit(0);
 }
