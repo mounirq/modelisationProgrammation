@@ -59,6 +59,11 @@ MonteCarlo::MonteCarlo(char *fileName)
             std::cerr << "Unkonwn option type" << std::endl;
         }
     }
+    pnl_vect_free(&weights);
+    pnl_vect_free(&sigma);
+    pnl_vect_free(&spot);
+    delete P;
+
 }
 
 MonteCarlo::MonteCarlo(BlackScholesModel *mod, Option *opt, PnlRng *rng, double fdStep, size_t nbSamples)
@@ -71,15 +76,14 @@ MonteCarlo::MonteCarlo(BlackScholesModel *mod, Option *opt, PnlRng *rng, double 
 }
 
 MonteCarlo::~MonteCarlo() {
-    free(mod_);
-    free(opt_);
-    free(rng_);
+    delete mod_;
+    delete opt_;
+    pnl_rng_free(&rng_);
 }
 
 void MonteCarlo::price(double &prix, double &ic)
 {
-    PnlMat *path;
-    path= pnl_mat_create(opt_->nbTimeSteps_+1,mod_->size_);
+    PnlMat *path = pnl_mat_create_from_scalar(opt_->nbTimeSteps_+1,mod_->size_, 0);
 
     double sum = 0;
     double icSum = 0;
@@ -109,8 +113,7 @@ void MonteCarlo::price(double &prix, double &ic)
 void MonteCarlo::price(const PnlMat *past, double t, double &prix, double &ic)
 {
     int nbActifs = mod_->size_;
-    PnlMat *path;
-    path= pnl_mat_create(opt_->nbTimeSteps_+1,nbActifs);
+    PnlMat *path = pnl_mat_create_from_scalar(opt_->nbTimeSteps_+1,nbActifs, 0);
 
     double sum = 0;
     double icSum = 0;
@@ -133,10 +136,12 @@ void MonteCarlo::price(const PnlMat *past, double t, double &prix, double &ic)
 
 void MonteCarlo::delta(const PnlMat *past, double t, PnlVect *delta) {
     int nbActifs = mod_->size_;
-    PnlMat *shift_plus_path = pnl_mat_create(opt_->nbTimeSteps_ + 1, nbActifs);
-    PnlMat *shift_moins_path = pnl_mat_create(opt_->nbTimeSteps_ + 1, nbActifs);
-    PnlMat *path = pnl_mat_create(opt_->nbTimeSteps_ + 1, nbActifs);
-    PnlVect *vect_sum = pnl_vect_create(nbActifs);
+    PnlMat *shift_plus_path = pnl_mat_create_from_scalar(opt_->nbTimeSteps_ + 1, nbActifs, 0);
+    PnlMat *shift_moins_path = pnl_mat_create_from_scalar(opt_->nbTimeSteps_ + 1, nbActifs, 0);
+    PnlMat *path = pnl_mat_create_from_scalar(opt_->nbTimeSteps_ + 1, nbActifs, 0);
+    PnlVect *vect_sum = pnl_vect_create_from_scalar(nbActifs, 0);
+
+    double deltaAttendu = 0;
 
     double timeStep = opt_->T_ / opt_->nbTimeSteps_;
 
@@ -154,13 +159,14 @@ void MonteCarlo::delta(const PnlMat *past, double t, PnlVect *delta) {
             mod_->shiftAsset(shift_moins_path, path, d, -fdStep_, t, timeStep);
 
             pnl_vect_set(vect_sum, d, pnl_vect_get(vect_sum, d) + opt_->payoff(shift_plus_path) - opt_->payoff(shift_moins_path));
+
         }
     }
 
     for (int d = 0; d < nbActifs; d++) {
         if (t == 0) {
-
-            pnl_vect_set(delta, d, pnl_vect_get(vect_sum, d) * exp(-mod_->r_ * (opt_->T_ - t))/(2.0 * nbSamples_ * pnl_mat_get(path, 0, d)* fdStep_));
+            deltaAttendu = pnl_vect_get(vect_sum, d) * exp(-mod_->r_ * (opt_->T_ - t))/(2.0 * nbSamples_ * pnl_mat_get(path, 0, d)* fdStep_);
+            pnl_vect_set(delta, d, deltaAttendu);
         } else {
             pnl_vect_set(delta, d, pnl_vect_get(vect_sum, d) * exp(-mod_->r_ * (opt_->T_ - t))/(2.0 * nbSamples_ * pnl_mat_get(path, past->m - 1, d) * fdStep_));
         }
@@ -168,5 +174,5 @@ void MonteCarlo::delta(const PnlMat *past, double t, PnlVect *delta) {
     pnl_mat_free(&shift_plus_path);
     pnl_mat_free(&shift_moins_path);
     pnl_mat_free(&path);
-    pnl_vect_free(& vect_sum);
+    pnl_vect_free(&vect_sum);
 }

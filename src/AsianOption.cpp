@@ -25,5 +25,6 @@ double AsianOption::payoff(const PnlMat *path) {
     double sum = pnl_vect_sum(pnlVect);
     sum /= (nbTimeSteps_ + 1);
     double payOffReturned = (sum - strike_ > 0) ? (sum - strike_) : 0;
+    pnl_vect_free(&pnlVect);
     return payOffReturned;
 }
