@@ -14,7 +14,7 @@ MonteCarlo::MonteCarlo(char *fileName)
     int size;
     double r;
     double rho;
-    PnlVect *sigma, *spot;
+    PnlVect *sigma, *spot, *trend;
     fdStep_ = 0.1;
 
     P->extract("sample number", this->nbSamples_);
@@ -23,7 +23,13 @@ MonteCarlo::MonteCarlo(char *fileName)
     P->extract("correlation", rho);
     P->extract("volatility", sigma, size);
     P->extract("spot", spot, size);
-    this->mod_ = new BlackScholesModel(size, r, rho, sigma, spot);
+    bool trendAvaible = P->extract("trend", trend, size, true);
+    if(trendAvaible){
+        this->mod_ = new BlackScholesModel(size, r, rho, sigma, spot, trend);
+    }
+    else{
+        this->mod_ = new BlackScholesModel(size, r, rho, sigma, spot);
+    }
 
     double T;
     int nbTimeSteps;
