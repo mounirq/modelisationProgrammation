@@ -25,4 +25,11 @@ target_link_libraries(mc-price-asian jl_parser prng ${LIBS})
 add_executable(test_class_BlackScholesModel test_class_BlackScholesModel.cpp)
 target_link_libraries(test_class_BlackScholesModel prng gtest ${LIBS})
 
+add_executable(test_class_basketOption test_class_basketOption.cpp)
+target_link_libraries(test_class_basketOption prng gtest ${LIBS})
 
+add_executable(test_class_asianOption test_class_asianOption.cpp)
+target_link_libraries(test_class_asianOption prng gtest ${LIBS})
+
+add_executable(test_class_performanceOption test_class_performanceOption.cpp)
+target_link_libraries(test_class_performanceOption prng gtest ${LIBS})
