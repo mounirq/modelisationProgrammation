@@ -3,6 +3,7 @@
 #include "pnl/pnl_random.h"
 #include "pnl/pnl_vector.h"
 #include "pnl/pnl_matrix.h"
+#include "RandomGenerator.hpp"
 
 /// \brief Modèle de Black Scholes
 class BlackScholesModel
@@ -22,7 +23,7 @@ public:
      * @param[in] T  maturité
      * @param[in] nbTimeSteps nombre de dates de constatation
      */
-    void asset(PnlMat *path, double T, int nbTimeSteps, PnlRng *rng);
+    void asset(PnlMat *path, double T, int nbTimeSteps, RandomGenerator *randomGenerator);
 
     /**
      * Calcule une trajectoire du sous-jacent connaissant le
@@ -36,7 +37,7 @@ public:
      * @param[in] T date jusqu'à laquelle on simule la trajectoire
      * @param[in] past trajectoire réalisée jusqu'a la date t
      */
-    void asset(PnlMat *path, double t, double T, int nbTimeSteps, PnlRng *rng, const PnlMat *past);
+    void asset(PnlMat *path, double t, double T, int nbTimeSteps, RandomGenerator *randomGenerator, const PnlMat *past);
 
     /**
      * Shift d'une trajectoire du sous-jacent
