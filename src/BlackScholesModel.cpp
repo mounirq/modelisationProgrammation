@@ -67,24 +67,20 @@ BlackScholesModel::~BlackScholesModel()
 	pnl_vect_free(&trend_);
 }
 
-void BlackScholesModel::asset(PnlMat *path, double T, int nbTimeSteps, RandomGenerator *randomGenerator)
+void BlackScholesModel::asset(PnlMat *path, double T, int nbTimeSteps, RandomGenerator *randomGenerator, PnlMat * corrMat)
 {
 	double timeVariation = T/nbTimeSteps;
-	PnlMat * corrMat = pnl_mat_create_from_scalar(size_, size_, rho_); // Create a PnlMat where all the elements = rho_
-	// Now we change all diag elements to 1
-	for(int i=0; i<size_; i++)
-	{
-		pnl_mat_set(corrMat, i, i, 1);
-	}
+
+
 	//pnl_mat_print(corrMat);
-	pnl_mat_chol(corrMat);
+
 	//pnl_mat_print(corrMat);
 
 	PnlMat * gaussMat = pnl_mat_create_from_scalar(nbTimeSteps, size_, 0);
 	randomGenerator->fillMatrix(gaussMat, nbTimeSteps, size_);
 
 	PnlVect * vectTmp = pnl_vect_create_from_scalar(size_, 0);
-	PnlVect * previousSpots = pnl_vect_create_from_scalar(size_, 0);
+	PnlVect * previousSpots = pnl_vect_create(size_);
 	pnl_vect_clone(previousSpots, spot_);
 	PnlVect * lineGauss = pnl_vect_create_from_scalar(size_, 0);
 
@@ -114,7 +110,7 @@ void BlackScholesModel::asset(PnlMat *path, double T, int nbTimeSteps, RandomGen
 	pnl_vect_free(&trend);
 }
 
-void BlackScholesModel::asset(PnlMat *path, double t, double T, int nbTimeSteps, RandomGenerator *randomGenerator, const PnlMat *past)
+void BlackScholesModel::asset(PnlMat *path, double t, double T, int nbTimeSteps, RandomGenerator *randomGenerator, const PnlMat *past, PnlMat * corrMat)
 {
 	int sizePast = past->m;
 	int numberOfExpectedElements = ceil(t*nbTimeSteps/T) + 1;
@@ -125,7 +121,7 @@ void BlackScholesModel::asset(PnlMat *path, double t, double T, int nbTimeSteps,
 		throw;
 	}
 
-	double timeI1 = 0;
+
 	double timeI = 0;
 	double timeVariation = T/nbTimeSteps;
 	PnlVect * previousSpots = pnl_vect_create_from_scalar(size_, 0);
@@ -140,20 +136,16 @@ void BlackScholesModel::asset(PnlMat *path, double t, double T, int nbTimeSteps,
 		timeI = timeI + timeVariation;
 		pnl_mat_get_row(vectTmp, past, i);
 		pnl_mat_set_row(path, vectTmp, i);
-		pnl_vect_clone(previousSpots, vectTmp);
+		if (i == sizePast){
+			pnl_vect_clone(previousSpots, vectTmp);
+		}
 	}
 	// I copy the last row of Past, which represents the spots at t
 	pnl_mat_get_row(vectTmp, past, sizePast-1);
 	pnl_vect_clone(previousSpots, vectTmp);
-	timeI1 = timeI + timeVariation;
+	double timeI1 = timeI + timeVariation;
 	timeI = t;
 
-	PnlMat * corrMat = pnl_mat_create_from_scalar(size_, size_, rho_); // Create a PnlMat where all the elements = rho_
-	// Now we change all diag elements to 1
-	for(int i=0; i<size_; i++)
-	{
-		pnl_mat_set(corrMat, i, i, 1);
-	}
 
 	int result = pnl_mat_chol(corrMat);
 
@@ -190,7 +182,7 @@ void BlackScholesModel::shiftAsset(PnlMat *shift_path, const PnlMat *path, int d
 	int index = 0;
 	int sizeMat = path->m;
 	double timeI = 0;
-	PnlVect * vectTmp = pnl_vect_create_from_scalar(size_, 0);
+	PnlVect * vectTmp = pnl_vect_create(size_);
 
 	// Copy the lines of path to shift_path where tI < t and without being outrange
 	while (timeI < t && index<sizeMat)
@@ -219,20 +211,22 @@ void computeVectMarket(PnlVect *vect, int size, PnlVect * previousSpots, PnlVect
 {
 	//double scalarCholGauss = pnl_vect_scalar_prod(upperChol, gaussVect);
 	//PnlVect * vect = pnl_vect_create_from_scalar(size, 0);
-	PnlVect * lineChol = pnl_vect_create_from_scalar(size, 0);
+	PnlVect * lineChol = pnl_vect_create(size);
 	double scalarCholGauss = 0;
 	double tmp = 0;
 	double expResult = 0;
 	double result = 0;
+	double sigmaI;
 	for (int i=0; i<size; i++)
 	{
 		pnl_mat_get_row(lineChol, cholMat, i);
 		scalarCholGauss = pnl_vect_scalar_prod(lineChol, gaussVect);
 
 		//tmp = (r[i] - (sigma[i]*sigma[i]/2))*variation + sigma[i] * scalarCholGauss * sqrt(variation);
-		tmp = (pnl_vect_get(r, i) - (pnl_vect_get(sigma, i)*pnl_vect_get(sigma, i)/2))*variation + pnl_vect_get(sigma, i) * scalarCholGauss * sqrt(variation);
+		sigmaI = pnl_vect_get(sigma, i);
+		//tmp = (pnl_vect_get(r, i) - sigmaI*sigmaI/2)*variation + sigmaI * scalarCholGauss * sqrt(variation);
 
-		expResult = exp(tmp);
+		expResult = exp((pnl_vect_get(r, i) - sigmaI*sigmaI/2)*variation + sigmaI * scalarCholGauss * sqrt(variation));
 
 		//result = previousSpots[i] * expResult;
 		result = pnl_vect_get(previousSpots, i) * expResult;
