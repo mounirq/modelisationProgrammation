@@ -1,9 +1,6 @@
 add_executable(test-parser test_parser.cpp)
 target_link_libraries(test-parser jl_parser ${LIBS})
 
-add_executable(mc-example mc_example.cpp test_mc_basket_from_file.cpp)
-target_link_libraries(mc-example jl_parser ${LIBS})
-
 add_executable(test_mc_delta test_mc_delta.cpp)
 target_link_libraries(test_mc_delta prng ${LIBS})
 
