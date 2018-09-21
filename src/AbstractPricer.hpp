@@ -1,38 +1,26 @@
-#pragma once
+#ifndef PROJETPRICERGIT_ABSTRACTPRICER_H
+#define PROJETPRICERGIT_ABSTRACTPRICER_H
 
-#include "Option.hpp"
+
 #include "BlackScholesModel.hpp"
-#include "pnl/pnl_random.h"
-#include "PnlRandom.hpp"
-#include "FakeRandom.hpp"
-#include <iostream>
-#include <jlparser/parser.hpp>
+#include "Option.hpp"
 
+class AbstractPricer {
 
-
-class MonteCarlo
-{
 public:
+
+
     BlackScholesModel *mod_; /*! pointeur vers le modèle */
     Option *opt_; /*! pointeur sur l'option */
     RandomGenerator *rng_; /*! pointeur sur le générateur */
     double fdStep_; /*! pas de différence finie */
     size_t nbSamples_; /*! nombre de tirages Monte Carlo */
 
-    MonteCarlo();
+    AbstractPricer();
+//    AbstractPricer(char *fileName);
+//    AbstractPricer(BlackScholesModel *model, Option *option, PnlRng *rng, double d, size_t i);
 
-    MonteCarlo(BlackScholesModel *mod_, Option *opt_, RandomGenerator *rng_, double fdStep_, size_t nbSamples_);
-
-    MonteCarlo(const MonteCarlo &MC);
-
-    MonteCarlo(char *fileName);
-/**
-     * Calcule le prix de l'option à la date 0
-     *
-     * @param[out] prix valeur de l'estimateur Monte Carlo
-     * @param[out] ic largeur de l'intervalle de confiance
-     */
-    void price(double &prix, double &ic);
+    virtual void price(double &prix, double &ic);
 
     /**
      * Calcule le prix de l'option à la date t
@@ -44,7 +32,7 @@ public:
      * @param[out] ic contient la largeur de l'intervalle
      * de confiance sur le calcul du prix
      */
-    void price(const PnlMat *past, double t, double &prix, double &ic);
+    virtual void price(const PnlMat *past, double t, double &prix, double &ic);
 
     /**
      * Calcule le delta de l'option à la date t
@@ -55,7 +43,7 @@ public:
      * @param[out] delta contient le vecteur de delta
      * de confiance sur le calcul du delta
      */
-    void delta(const PnlMat *past, double t, PnlVect *delta);
+    virtual void delta(const PnlMat *past, double t, PnlVect *delta);
 
     /**
      * Calcule le P&L a partir d'une trajectoire de marché donnée
@@ -66,10 +54,8 @@ public:
      */
     void profits_and_losses(const PnlMat *market_trajectory, double &p_and_l);
 
-    ~MonteCarlo();
-
-
+    virtual ~AbstractPricer();
 };
 
 
-
+#endif //PROJETPRICERGIT_ABSTRACTPRICER_H

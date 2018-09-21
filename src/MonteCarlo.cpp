@@ -1,10 +1,7 @@
-#include <iostream>
-#include <string>
 #include "MonteCarlo.hpp"
-#include "jlparser/parser.hpp"
+#include "PerformanceOption.hpp"
 #include "BasketOption.hpp"
 #include "AsianOption.hpp"
-#include "PerformanceOption.hpp"
 
 MonteCarlo::MonteCarlo(char *fileName)
 {
@@ -34,12 +31,8 @@ MonteCarlo::MonteCarlo(char *fileName)
     P->extract("maturity", T);
     P->extract("timestep number", nbTimeSteps);
     P->extract("payoff coefficients", weights, size);
-//    rng_ = pnl_rng_create(PNL_RNG_MERSENNE);
-//    pnl_rng_sseed(rng_, time(NULL));
 
     rng_ = new PnlRandom();
-
-    //decommenter les lignes commentees si l'option performance marche
 
     if (optionType.compare("performance") == 0 )
     {
@@ -64,7 +57,6 @@ MonteCarlo::MonteCarlo(char *fileName)
     pnl_vect_free(&sigma);
     pnl_vect_free(&spot);
     delete P;
-
 }
 
 MonteCarlo::MonteCarlo(BlackScholesModel *mod, Option *opt, RandomGenerator *rng, double fdStep, size_t nbSamples)
@@ -127,7 +119,7 @@ void MonteCarlo::price(const PnlMat *past, double t, double &prix, double &ic)
         sum += payoffTmp;
         icSum = payoffTmp * payoffTmp;
     }
-    prix = (exp(-mod_->r_ * opt_->T_)/nbSamples_) * sum;
+    prix = (exp(-mod_->r_ * (opt_->T_-t))/nbSamples_) * sum;
 
     double varApprochee = exp(- 2 * mod_->r_ * opt_->T_) * ( ((1.0/nbSamples_) * icSum) - ((1.0/nbSamples_) * sum) * ((1.0/nbSamples_) * sum) );
     ic = 2 * 1.96 * sqrt(varApprochee/nbSamples_);
