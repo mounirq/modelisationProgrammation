@@ -95,10 +95,12 @@ void MonteCarlo::price(double &prix, double &ic)
     double sum = 0;
     double icSum = 0;
     double payoffTmp = 0;
-
+	PnlMat * corrMat = pnl_mat_create_from_scalar(mod_->size_, mod_ ->size_, mod_ ->rho_);
+	pnl_mat_set_diag(corrMat,1, 0);
+	pnl_mat_chol(corrMat);
     for (int i=0 ; i<nbSamples_ ; i++)
     {
-        mod_->asset(path, opt_->T_, opt_->nbTimeSteps_, rng_);
+        mod_->asset(path, opt_->T_, opt_->nbTimeSteps_, rng_, corrMat);
 
         payoffTmp = opt_->payoff(path);
         sum += payoffTmp;
@@ -125,10 +127,13 @@ void MonteCarlo::price(const PnlMat *past, double t, double &prix, double &ic)
     double sum = 0;
     double icSum = 0;
     double payoffTmp = 0;
+	PnlMat * corrMat = pnl_mat_create_from_scalar(mod_->size_, mod_ ->size_, mod_ ->rho_);
+	pnl_mat_set_diag(corrMat,1, 0);
+	pnl_mat_chol(corrMat);
 
     for (int i=0 ; i<nbSamples_ ; i++)
     {
-        mod_->asset(path, t, opt_->T_, opt_->nbTimeSteps_, rng_, past);
+        mod_->asset(path, t, opt_->T_, opt_->nbTimeSteps_, rng_, past, corrMat);
         payoffTmp = opt_->payoff(path);
         sum += payoffTmp;
         icSum = payoffTmp * payoffTmp;
@@ -149,6 +154,9 @@ void MonteCarlo::delta(const PnlMat *past, double t, PnlVect *delta, PnlVect *ic
     PnlVect *vect_sum = pnl_vect_create_from_scalar(nbActifs, 0);
     PnlVect *sum = pnl_vect_create_from_scalar(nbActifs, 0);
     PnlVect *icSum = pnl_vect_create_from_scalar(nbActifs, 0);
+	PnlMat * corrMat = pnl_mat_create_from_scalar(mod_->size_, mod_ ->size_, mod_ ->rho_);
+	pnl_mat_set_diag(corrMat,1, 0);
+	pnl_mat_chol(corrMat);
 
     double deltaAttendu = 0;
 
@@ -157,9 +165,9 @@ void MonteCarlo::delta(const PnlMat *past, double t, PnlVect *delta, PnlVect *ic
     for (int j = 0; j < nbSamples_; j++) {
 
         if (t == 0) {
-            mod_->asset(path, opt_->T_, opt_->nbTimeSteps_, rng_);
+            mod_->asset(path, opt_->T_, opt_->nbTimeSteps_, rng_, corrMat);
         } else {
-            mod_->asset(path, t, opt_->T_, opt_->nbTimeSteps_, rng_, past);
+            mod_->asset(path, t, opt_->T_, opt_->nbTimeSteps_, rng_, past, corrMat);
         }
 
         for (int d = 0; d < nbActifs; d++) {
