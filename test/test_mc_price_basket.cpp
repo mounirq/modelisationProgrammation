@@ -31,10 +31,13 @@ int main(int argc, char **argv)
     double ic1;
 
     int nbSamples = 50000;
+    PnlRandom * pnlRandom = new PnlRandom();
+    MonteCarlo *mc = new MonteCarlo(bs, optionBasket, pnlRandom, 0.01, nbSamples);
 
-//    MonteCarlo *mc = new MonteCarlo(bs, optionBasket, rng, 0.01, nbSamples);
+    //construire MonteCarlo a partir du nom de fichier : cet appel compile mais ne marche pas
+//    MonteCarlo *mc1 = new MonteCarlo((char *)"../../data/basket_1.dat");
 
-    MonteCarlo *mc = new MonteCarlo((char *) "../../data/basket_1.dat");
+    MonteCarlo *mc1 = new MonteCarlo((char *) "../../data/basket_1.dat");
 
     mc->price(prix1,ic1);
     cout << "Le prix à t=0 est : " << prix1 << endl;
