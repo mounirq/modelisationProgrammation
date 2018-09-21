@@ -63,6 +63,6 @@ public:
 
 };
 
-PnlVect * computeVect(int size, PnlVect * previousSpots, double r, PnlVect *sigma, double variation, PnlVect * upperChol, PnlVect * guassVect);
+void computeVect(PnlVect *vect, int size, PnlVect * previousSpots, double r, PnlVect *sigma, double variation, PnlVect * upperChol, PnlVect * guassVect);
 
 

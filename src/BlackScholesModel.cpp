@@ -32,15 +32,16 @@ BlackScholesModel::BlackScholesModel(const BlackScholesModel & blackScholesModel
 
 BlackScholesModel::~BlackScholesModel()
 {
+	std::cout<<"\nYasmine\n";
 	pnl_vect_free(&sigma_);
 	pnl_vect_free(&spot_);
 }
 
-PnlVect * computeVect(int size, PnlVect * previousSpots, double r, PnlVect *sigma, double variation, PnlMat * cholMat, PnlVect * gaussVect)
+void computeVect(PnlVect* vect, int size, PnlVect * previousSpots, double r, PnlVect *sigma, double variation, PnlMat * cholMat, PnlVect * gaussVect)
 {
 
 	//double scalarCholGauss = pnl_vect_scalar_prod(upperChol, gaussVect);
-	PnlVect * vect = pnl_vect_create_from_scalar(size, 0);
+	//PnlVect * vect = pnl_vect_create_from_scalar(size, 0);
 	PnlVect * lineChol = pnl_vect_create_from_scalar(size, 0);
 	double scalarCholGauss = 0;
 	double tmp = 0;
@@ -65,7 +66,7 @@ PnlVect * computeVect(int size, PnlVect * previousSpots, double r, PnlVect *sigm
 	}
 	//Free
 	pnl_vect_free(&lineChol);
-	return vect;
+
 
 }
 
@@ -79,7 +80,7 @@ void BlackScholesModel::asset(PnlMat *path, double T, int nbTimeSteps, PnlRng *r
 		pnl_mat_set(corrMat, i, i, 1);
 	}
 	//pnl_mat_print(corrMat);
-	int result = pnl_mat_chol(corrMat);
+	pnl_mat_chol(corrMat);
 	//pnl_mat_print(corrMat);
 
 	PnlMat * gaussMat = pnl_mat_create_from_scalar(nbTimeSteps, size_, 0);
@@ -97,7 +98,7 @@ void BlackScholesModel::asset(PnlMat *path, double T, int nbTimeSteps, PnlRng *r
 
 		pnl_mat_get_row(lineGauss, gaussMat, i-1);
 
-		vectTmp = computeVect(size_, previousSpots, r_, sigma_, timeVariation, corrMat, lineGauss);
+		computeVect(vectTmp, size_, previousSpots, r_, sigma_, timeVariation, corrMat, lineGauss);
 		//pnl_mat_print(corrMat);
 
 		pnl_mat_set_row(path, vectTmp, i);
@@ -111,7 +112,6 @@ void BlackScholesModel::asset(PnlMat *path, double T, int nbTimeSteps, PnlRng *r
 	pnl_vect_free(&vectTmp);
 	pnl_vect_free(&previousSpots);
 	pnl_vect_free(&lineGauss);
-
 }
 
 void BlackScholesModel::asset(PnlMat *path, double t, double T, int nbTimeSteps, PnlRng *rng, const PnlMat *past)
@@ -163,7 +163,7 @@ void BlackScholesModel::asset(PnlMat *path, double t, double T, int nbTimeSteps,
 	{
 		timeVariation = timeI1 - timeI;
 		pnl_mat_get_row(lineGauss, gaussMat, i-(sizePast-1));
-		vectTmp = computeVect(size_, previousSpots, r_, sigma_, timeVariation, corrMat, lineGauss);
+		computeVect(vectTmp, size_, previousSpots, r_, sigma_, timeVariation, corrMat, lineGauss);
 		pnl_mat_set_row(path, vectTmp, i);
 		previousSpots = pnl_vect_copy(vectTmp);
 		timeI = timeI1;
