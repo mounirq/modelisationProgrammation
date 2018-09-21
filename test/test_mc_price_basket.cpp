@@ -30,7 +30,7 @@ int main(int argc, char **argv)
     double prix1;
     double ic1;
 
-    int nbSamples = 50000;
+    int nbSamples = 100;
 
 //    MonteCarlo *mc = new MonteCarlo(bs, optionBasket, rng, 0.01, nbSamples);
 
@@ -53,9 +53,9 @@ int main(int argc, char **argv)
     pnl_rng_free(&rng);
     pnl_vect_free(&delta);
     pnl_mat_free(&past);
-    delete optionBasket;
-    delete bs;
-    delete mc;
+//    delete optionBasket;
+//    delete bs;
+//    delete mc;
 
     exit(0);
 }
