@@ -30,9 +30,8 @@ int main(int argc, char **argv)
     double prix1;
     double ic1;
 
-    int nbSamples = 100;
+    int nbSamples = 50000;
     PnlRandom * pnlRandom = new PnlRandom();
-//    MonteCarlo *mc = new MonteCarlo(bs, optionBasket, rng, 0.01, nbSamples);
     MonteCarlo *mc = new MonteCarlo(bs, optionBasket, pnlRandom, 0.01, nbSamples);
 
     //construire MonteCarlo a partir du nom de fichier : cet appel compile mais ne marche pas
@@ -40,15 +39,30 @@ int main(int argc, char **argv)
 
 //    mc->price(prix1,ic1);
 //    mc1->price(prix1,ic1);
+//    MonteCarlo *mc = new MonteCarlo(bs, optionBasket, rng, 0.01, nbSamples);
+
+    MonteCarlo *mc = new MonteCarlo((char *) "../../data/basket_1.dat");
+
     mc->price(prix1,ic1);
     cout << "Le prix à t=0 est : " << prix1 << endl;
 
     cout << "La largeur de l'intervalle de confiance est : " << ic1 << endl;
 
-    PnlVect * delta = pnl_vect_create(size);
-    PnlMat * past = pnl_mat_new();
+    PnlVect *delta = pnl_vect_create_from_scalar(size, 1);
+    PnlMat *past = pnl_mat_create_from_scalar(size, nbTimeSteps+1, 100);
     mc->delta(past, 0, delta);
-    pnl_vect_print(delta);
+
+//    pnl_vect_print(delta);
+
+    pnl_vect_free(&initialSpots);
+    pnl_vect_free(&volatilities);
+    pnl_vect_free(&weights);
+    pnl_rng_free(&rng);
+    pnl_vect_free(&delta);
+    pnl_mat_free(&past);
+    delete optionBasket;
+    delete bs;
+    delete mc;
 
     exit(0);
 }

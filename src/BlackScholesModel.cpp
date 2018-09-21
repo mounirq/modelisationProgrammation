@@ -40,8 +40,8 @@ PnlVect * computeVect(int size, PnlVect * previousSpots, double r, PnlVect *sigm
 {
 
 	//double scalarCholGauss = pnl_vect_scalar_prod(upperChol, gaussVect);
-	PnlVect * vect = pnl_vect_create(size);
-	PnlVect * lineChol = pnl_vect_create(size);
+	PnlVect * vect = pnl_vect_create_from_scalar(size, 0);
+	PnlVect * lineChol = pnl_vect_create_from_scalar(size, 0);
 	double scalarCholGauss = 0;
 	double tmp = 0;
 	double expResult = 0;
@@ -82,12 +82,12 @@ void BlackScholesModel::asset(PnlMat *path, double T, int nbTimeSteps, RandomGen
 	int result = pnl_mat_chol(corrMat);
 	//pnl_mat_print(corrMat);
 
-	PnlMat * gaussMat = pnl_mat_create(nbTimeSteps, size_);
+	PnlMat * gaussMat = pnl_mat_create_from_scalar(nbTimeSteps, size_, 0);
 	randomGenerator->fillMatrix(gaussMat, nbTimeSteps, size_);
 
-	PnlVect * vectTmp = pnl_vect_create(size_);
+	PnlVect * vectTmp = pnl_vect_create_from_scalar(size_, 0);
 	PnlVect * previousSpots = pnl_vect_copy(spot_);
-	PnlVect * lineGauss = pnl_vect_create(size_);
+	PnlVect * lineGauss = pnl_vect_create_from_scalar(size_, 0);
 
 
 	// Start of trajectory generation
@@ -129,7 +129,7 @@ void BlackScholesModel::asset(PnlMat *path, double t, double T, int nbTimeSteps,
 	double timeI = 0;
 	double timeVariation = T/nbTimeSteps;
 	PnlVect * previousSpots = pnl_vect_copy(spot_);
-	PnlVect * vectTmp = pnl_vect_create(size_);
+	PnlVect * vectTmp = pnl_vect_create_from_scalar(size_, 0);
 
 	pnl_mat_set_row(path, spot_, 0); // Copy the initial spots
 
@@ -155,9 +155,11 @@ void BlackScholesModel::asset(PnlMat *path, double t, double T, int nbTimeSteps,
 	}
 
 	int result = pnl_mat_chol(corrMat);
-	PnlMat * gaussMat = pnl_mat_create(nbTimeSteps-(sizePast-1)+1, size_);
+
+	PnlMat * gaussMat = pnl_mat_create_from_scalar(nbTimeSteps-(sizePast-1)+1, size_, 0);
     randomGenerator->fillMatrix(gaussMat, nbTimeSteps-(sizePast-1)+1 , size_);
-	PnlVect * lineGauss = pnl_vect_create(size_);
+	PnlVect * lineGauss = pnl_vect_create_from_scalar(size_, 0);
+
 	int beginning = (sizePast-1 > 1)? sizePast-1 : 1 ;
 	for (int i=beginning; i<nbTimeSteps+1; i++)
 	{
@@ -182,7 +184,7 @@ void BlackScholesModel::shiftAsset(PnlMat *shift_path, const PnlMat *path, int d
 	int index = 0;
 	int sizeMat = path->m;
 	double timeI = 0;
-	PnlVect * vectTmp = pnl_vect_create(size_);
+	PnlVect * vectTmp = pnl_vect_create_from_scalar(size_, 0);
 
 	// Copy the lines of path to shift_path where tI < t and without being outrange
 	while (timeI < t && index<sizeMat)
