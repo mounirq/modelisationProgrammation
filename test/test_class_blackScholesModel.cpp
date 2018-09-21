@@ -238,6 +238,41 @@ TEST_F(BlackScholesModelTest, asset_in_t_not_multiple_of_discretization_path){
     pnl_mat_free(&past);
 }
 
+TEST_F(BlackScholesModelTest, asset_in_t_equals_maturity){
+    int nbTimeSteps = 5;
+    int nbUnderlyings = 2;
+    double maturity = 1;
+    PnlVect * sigma = pnl_vect_create(nbUnderlyings);
+    PnlVect * spot = pnl_vect_create(nbUnderlyings);
+    pnl_vect_set(sigma, 0, 0.25);
+    pnl_vect_set(sigma, 1, 0.20);
+    pnl_vect_set(spot, 0, 10);
+    pnl_vect_set(spot, 1, 15);
+    BlackScholesModel model = BlackScholesModel(nbUnderlyings, 0.03, 0.15, sigma, spot);
+    PnlMat * past = pnl_mat_create(6, nbUnderlyings);
+    pnl_mat_set(past, 0, 0, 10);
+    pnl_mat_set(past, 0, 1, 15);
+    pnl_mat_set(past, 1, 0, 11);
+    pnl_mat_set(past, 1, 1, 12);
+    pnl_mat_set(past, 2, 0, 13);
+    pnl_mat_set(past, 2, 1, 14);
+    pnl_mat_set(past, 3, 0, 13);
+    pnl_mat_set(past, 3, 1, 16);
+    pnl_mat_set(past, 4, 0, 17);
+    pnl_mat_set(past, 4, 1, 11);
+    PnlMat * path = pnl_mat_create(nbTimeSteps + 1, nbUnderlyings);
+    FakeRandom * fakeRandom = new FakeRandom();
+    model.asset(path, 1, maturity, nbTimeSteps, fakeRandom, past);
+
+    EXPECT_TRUE(pnl_mat_isequal(path, past, 1e-15));
+
+    pnl_vect_free(&sigma);
+    pnl_vect_free(&spot);
+    pnl_mat_free(&path);
+    delete fakeRandom;
+    pnl_mat_free(&past);
+}
+
 TEST_F(BlackScholesModelTest, shift_asset){
 	int size = 6;
 	// vector of volatilities set to 0.2
