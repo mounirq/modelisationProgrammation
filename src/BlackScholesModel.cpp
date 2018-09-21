@@ -17,8 +17,10 @@ BlackScholesModel::BlackScholesModel(int size, double r, double rho, PnlVect *si
 	size_ = size;
 	r_ = r;
 	rho_ = rho;
-	sigma_ = pnl_vect_copy(sigma);
-	spot_ = pnl_vect_copy(spot);
+	sigma_ = pnl_vect_create_from_scalar(size_, 0);
+	pnl_vect_clone(sigma_, sigma);
+	spot_ = pnl_vect_create_from_scalar(size_, 0);
+	pnl_vect_clone(spot_, spot);
 }
 
 BlackScholesModel::BlackScholesModel(const BlackScholesModel & blackScholesModel)
@@ -26,8 +28,11 @@ BlackScholesModel::BlackScholesModel(const BlackScholesModel & blackScholesModel
 	size_ = blackScholesModel.size_;
 	r_ = blackScholesModel.r_;
 	rho_ = blackScholesModel.rho_;
-	sigma_ = pnl_vect_copy(blackScholesModel.sigma_);
-	spot_ = pnl_vect_copy(blackScholesModel.spot_);
+	sigma_ = pnl_vect_create_from_scalar(size_, 0);
+	pnl_vect_clone(sigma_, blackScholesModel.sigma_);
+	spot_ = pnl_vect_create_from_scalar(size_, 0);
+	pnl_vect_clone(spot_, blackScholesModel.spot_);
+
 }
 
 BlackScholesModel::~BlackScholesModel()
@@ -87,7 +92,8 @@ void BlackScholesModel::asset(PnlMat *path, double T, int nbTimeSteps, PnlRng *r
 	pnl_mat_rng_normal(gaussMat, nbTimeSteps , size_, rng);
 
 	PnlVect * vectTmp = pnl_vect_create_from_scalar(size_, 0);
-	PnlVect * previousSpots = pnl_vect_copy(spot_);
+	PnlVect * previousSpots = pnl_vect_create_from_scalar(size_, 0);
+	pnl_vect_clone(previousSpots, spot_);
 	PnlVect * lineGauss = pnl_vect_create_from_scalar(size_, 0);
 
 
@@ -103,7 +109,7 @@ void BlackScholesModel::asset(PnlMat *path, double T, int nbTimeSteps, PnlRng *r
 
 		pnl_mat_set_row(path, vectTmp, i);
 
-		previousSpots = pnl_vect_copy(vectTmp);
+		pnl_vect_clone(previousSpots, vectTmp);
 
 	}
 	//Free
@@ -128,7 +134,8 @@ void BlackScholesModel::asset(PnlMat *path, double t, double T, int nbTimeSteps,
 	double timeI1 = 0;
 	double timeI = 0;
 	double timeVariation = T/nbTimeSteps;
-	PnlVect * previousSpots = pnl_vect_copy(spot_);
+	PnlVect * previousSpots = pnl_vect_create_from_scalar(size_, 0);
+	pnl_vect_clone(previousSpots, spot_);
 	PnlVect * vectTmp = pnl_vect_create_from_scalar(size_, 0);
 
 	pnl_mat_set_row(path, spot_, 0); // Copy the initial spots
@@ -139,11 +146,11 @@ void BlackScholesModel::asset(PnlMat *path, double t, double T, int nbTimeSteps,
 		timeI = timeI + timeVariation;
 		pnl_mat_get_row(vectTmp, past, i);
 		pnl_mat_set_row(path, vectTmp, i);
-		previousSpots = pnl_vect_copy(vectTmp);
+		pnl_vect_clone(previousSpots, vectTmp);
 	}
 	// I copy the last row of Past, which represents the spots at t
 	pnl_mat_get_row(vectTmp, past, sizePast-1);
-	previousSpots = pnl_vect_copy(vectTmp);
+	pnl_vect_clone(previousSpots, vectTmp);
 	timeI1 = timeI + timeVariation;
 	timeI = t;
 
@@ -165,7 +172,7 @@ void BlackScholesModel::asset(PnlMat *path, double t, double T, int nbTimeSteps,
 		pnl_mat_get_row(lineGauss, gaussMat, i-(sizePast-1));
 		computeVect(vectTmp, size_, previousSpots, r_, sigma_, timeVariation, corrMat, lineGauss);
 		pnl_mat_set_row(path, vectTmp, i);
-		previousSpots = pnl_vect_copy(vectTmp);
+		pnl_vect_clone(previousSpots, vectTmp);
 		timeI = timeI1;
 		timeI1 = timeI1 + T/nbTimeSteps;
 	}
