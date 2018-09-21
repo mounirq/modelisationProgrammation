@@ -34,9 +34,10 @@ MonteCarlo::MonteCarlo(char *fileName)
     P->extract("maturity", T);
     P->extract("timestep number", nbTimeSteps);
     P->extract("payoff coefficients", weights, size);
-    rng_ = pnl_rng_create(PNL_RNG_MERSENNE);
+//    rng_ = pnl_rng_create(PNL_RNG_MERSENNE);
+//    pnl_rng_sseed(rng_, time(NULL));
 
-    pnl_rng_sseed(rng_, time(NULL));
+    rng_ = new PnlRandom();
 
     //decommenter les lignes commentees si l'option performance marche
 
@@ -66,7 +67,7 @@ MonteCarlo::MonteCarlo(char *fileName)
 
 }
 
-MonteCarlo::MonteCarlo(BlackScholesModel *mod, Option *opt, PnlRng *rng, double fdStep, size_t nbSamples)
+MonteCarlo::MonteCarlo(BlackScholesModel *mod, Option *opt, RandomGenerator *rng, double fdStep, size_t nbSamples)
 {
     mod_ = mod;
     opt_ = opt;
@@ -78,7 +79,7 @@ MonteCarlo::MonteCarlo(BlackScholesModel *mod, Option *opt, PnlRng *rng, double 
 MonteCarlo::~MonteCarlo() {
     delete mod_;
     delete opt_;
-    pnl_rng_free(&rng_);
+    delete rng_;
 }
 
 void MonteCarlo::price(double &prix, double &ic)

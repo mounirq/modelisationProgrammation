@@ -3,20 +3,21 @@
 #include "Option.hpp"
 #include "BlackScholesModel.hpp"
 #include "pnl/pnl_random.h"
-#include "AbstractPricer.h"
+#include "PnlRandom.hpp"
+#include "FakeRandom.hpp"
 
 class MonteCarlo
 {
 public:
     BlackScholesModel *mod_; /*! pointeur vers le modèle */
     Option *opt_; /*! pointeur sur l'option */
-    PnlRng *rng_; /*! pointeur sur le générateur */
+    RandomGenerator *rng_; /*! pointeur sur le générateur */
     double fdStep_; /*! pas de différence finie */
     size_t nbSamples_; /*! nombre de tirages Monte Carlo */
 
     MonteCarlo();
 
-    MonteCarlo(BlackScholesModel *mod_, Option *opt_, PnlRng *rng_, double fdStep_, size_t nbSamples_);
+    MonteCarlo(BlackScholesModel *mod_, Option *opt_, RandomGenerator *rng_, double fdStep_, size_t nbSamples_);
 
     MonteCarlo(const MonteCarlo &MC);
 

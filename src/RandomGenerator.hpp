@@ -13,7 +13,7 @@ public:
 
     RandomGenerator();
 
-    RandomGenerator(const RandomGenerator & randomGenerator);
+    RandomGenerator(const RandomGenerator * randomGenerator);
 
     virtual ~RandomGenerator();
 
