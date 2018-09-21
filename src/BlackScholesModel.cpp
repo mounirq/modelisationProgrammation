@@ -69,7 +69,7 @@ PnlVect * computeVect(int size, PnlVect * previousSpots, double r, PnlVect *sigm
 
 }
 
-void BlackScholesModel::asset(PnlMat *path, double T, int nbTimeSteps, PnlRng *rng)
+void BlackScholesModel::asset(PnlMat *path, double T, int nbTimeSteps, RandomGenerator *randomGenerator)
 {
 	double timeVariation = T/nbTimeSteps;
 	PnlMat * corrMat = pnl_mat_create_from_scalar(size_, size_, rho_); // Create a PnlMat where all the elements = rho_
@@ -83,7 +83,7 @@ void BlackScholesModel::asset(PnlMat *path, double T, int nbTimeSteps, PnlRng *r
 	//pnl_mat_print(corrMat);
 
 	PnlMat * gaussMat = pnl_mat_create(nbTimeSteps, size_);
-	pnl_mat_rng_normal(gaussMat, nbTimeSteps , size_, rng);
+	randomGenerator->fillMatrix(gaussMat, nbTimeSteps, size_);
 
 	PnlVect * vectTmp = pnl_vect_create(size_);
 	PnlVect * previousSpots = pnl_vect_copy(spot_);
@@ -114,7 +114,7 @@ void BlackScholesModel::asset(PnlMat *path, double T, int nbTimeSteps, PnlRng *r
 
 }
 
-void BlackScholesModel::asset(PnlMat *path, double t, double T, int nbTimeSteps, PnlRng *rng, const PnlMat *past)
+void BlackScholesModel::asset(PnlMat *path, double t, double T, int nbTimeSteps, RandomGenerator *randomGenerator, const PnlMat *past)
 {
 	int sizePast = past->m;
 	int numberOfExpectedElements = ceil(t*nbTimeSteps/T) + 1;
@@ -156,7 +156,7 @@ void BlackScholesModel::asset(PnlMat *path, double t, double T, int nbTimeSteps,
 
 	int result = pnl_mat_chol(corrMat);
 	PnlMat * gaussMat = pnl_mat_create(nbTimeSteps-(sizePast-1)+1, size_);
-	pnl_mat_rng_normal(gaussMat, nbTimeSteps-(sizePast-1)+1 , size_, rng);
+    randomGenerator->fillMatrix(gaussMat, nbTimeSteps-(sizePast-1)+1 , size_);
 	PnlVect * lineGauss = pnl_vect_create(size_);
 	int beginning = (sizePast-1 > 1)? sizePast-1 : 1 ;
 	for (int i=beginning; i<nbTimeSteps+1; i++)
