@@ -21,3 +21,6 @@ target_link_libraries(test_class_asianOption prng gtest ${LIBS})
 
 add_executable(test_class_performanceOption test_class_performanceOption.cpp)
 target_link_libraries(test_class_performanceOption prng gtest ${LIBS})
+
+add_executable(test_class_FakeRandom test_class_FakeRandom.cpp)
+target_link_libraries(test_class_FakeRandom prng gtest ${LIBS})
