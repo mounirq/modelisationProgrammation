@@ -23,15 +23,16 @@ int main(int argc, char **argv)
 
     BlackScholesModel *bs = new BlackScholesModel(size, intrestRate, rho, volatilities, initialSpots);
 
-    PnlRng *rng = pnl_rng_create(PNL_RNG_MERSENNE);
-
-    pnl_rng_sseed(rng, time(NULL));
+//    PnlRng *rng = pnl_rng_create(PNL_RNG_MERSENNE);
+//
+//    pnl_rng_sseed(rng, time(NULL));
 
     double prix1;
     double ic1;
 
     int nbSamples = 50000;
 
+    PnlRandom *rng = new PnlRandom();
 
     MonteCarlo *mc = new MonteCarlo(bs, asianOption, rng, 0.01, nbSamples);
 

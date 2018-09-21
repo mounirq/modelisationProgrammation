@@ -1,9 +1,8 @@
 add_executable(test-parser test_parser.cpp)
 target_link_libraries(test-parser jl_parser ${LIBS})
 
-add_executable(mc-example mc_example.cpp)
-target_link_libraries(mc-example jl_parser ${LIBS})
-
+add_executable(test_mc_delta test_mc_delta.cpp)
+target_link_libraries(test_mc_delta prng ${LIBS})
 
 add_executable(test_basketOption test_basketOption.cpp)
 target_link_libraries(test_basketOption prng ${LIBS})
@@ -13,7 +12,6 @@ target_link_libraries(test_asianOption prng ${LIBS})
 
 add_executable(test_performanceOption test_performanceOption.cpp)
 target_link_libraries(test_performanceOption prng ${LIBS})
-
 
 add_executable(test_blackScholesModel test_blackScholesModel.cpp)
 target_link_libraries(test_blackScholesModel prng ${LIBS})
