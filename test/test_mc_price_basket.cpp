@@ -48,7 +48,7 @@ int main(int argc, char **argv)
     PnlMat *past = pnl_mat_create_from_scalar(size, nbTimeSteps+1, 100);
     mc->delta(past, 0, delta);
 
-//    pnl_vect_print(delta);
+    pnl_vect_print(delta);
 
     pnl_vect_free(&initialSpots);
     pnl_vect_free(&volatilities);
