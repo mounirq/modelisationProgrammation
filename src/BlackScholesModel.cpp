@@ -37,7 +37,6 @@ BlackScholesModel::BlackScholesModel(const BlackScholesModel & blackScholesModel
 
 BlackScholesModel::~BlackScholesModel()
 {
-	std::cout<<"\nYasmine\n";
 	pnl_vect_free(&sigma_);
 	pnl_vect_free(&spot_);
 }
