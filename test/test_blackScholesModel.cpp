@@ -21,12 +21,13 @@ int main(int argc, char **argv)
 	pnl_vect_set(sigma, 1, 0.20);
 	pnl_vect_set(spot, 0, 10);
 	pnl_vect_set(spot, 1, 15);
+    // Fill path in t = 0
 	BlackScholesModel model = BlackScholesModel(nbUnderlyings, 0.03, 0.15, sigma, spot);
 	PnlMat * path = pnl_mat_create(nbTimeSteps + 1, nbUnderlyings);
 	FakeRandom * fakeRandom = new FakeRandom();
 	model.asset(path, maturity, nbTimeSteps, fakeRandom);
+    cout << "The spot matrix calculated by asset is : \n";
 	pnl_mat_print(path);
-
     PnlMat * corrMat = pnl_mat_create_from_scalar(nbUnderlyings, nbUnderlyings, 0.15);
     for(int i=0; i<nbUnderlyings; i++)
     {
@@ -36,7 +37,6 @@ int main(int argc, char **argv)
     double L_1G = pnl_mat_get(corrMat,0,0) +pnl_mat_get(corrMat,0,1) ;
     double L_2G = pnl_mat_get(corrMat,1,0) + pnl_mat_get(corrMat,1,1) ;
     PnlVect *lVector = pnl_vect_create_from_list(2, L_1G, L_2G);
-
     /* t = T/5 = 1/5 */
     PnlMat *matrixSpot = pnl_mat_create(6,2);
     pnl_mat_set(matrixSpot, 0, 0, 10);
@@ -50,25 +50,6 @@ int main(int argc, char **argv)
     }
     cout << "The spot matrix must be equal to : \n";
     pnl_mat_print(matrixSpot);
-
-
-/*	pnl_vect_print(sigma);
-	pnl_vect_print_asrow(sigma)*/;
-
-/*
-	PnlMat * past = pnl_mat_create(3, nbUnderlyings);
-	pnl_mat_set(past, 0, 0, 10);
-	pnl_mat_set(past, 0, 1, 15);
-	pnl_mat_set(past, 1, 0, 10.292682);
-	pnl_mat_set(past, 1, 1, 15.169634);
-	pnl_mat_set(past, 2, 0, 10.263704);
-	pnl_mat_set(past, 2, 1, 15.039295);
-	//pnl_mat_print(past);
-	FakeRandom * fakeRandom = new FakeRandom();
-	model.asset(path, 0.3, maturity, nbTimeSteps, fakeRandom, past);
-	pnl_mat_print(path);
-*/
-
 
 /*	PnlMat * shift_path = pnl_mat_create(nbTimeSteps+1, nbUnderlyings);
 	cout<<"--------------\n";
