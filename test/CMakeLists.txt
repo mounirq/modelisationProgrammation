@@ -27,3 +27,6 @@ target_link_libraries(test_pl_basket prng ${LIBS})
 
 add_executable(test_class_FakeRandom test_class_FakeRandom.cpp)
 target_link_libraries(test_class_FakeRandom prng gtest ${LIBS})
+
+add_executable(test_class_MonteCarlo test_class_MonteCarlo.cpp)
+target_link_libraries(test_class_MonteCarlo prng gtest ${LIBS})

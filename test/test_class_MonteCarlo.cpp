@@ -97,6 +97,23 @@ TEST_F(MonteCarloTest, test_price_asian){
 
 }
 
+TEST_F(MonteCarloTest, test_price_basket_file){
+
+    MonteCarlo *mc = new MonteCarlo((char *) "/user/2/.base/errounda/home/3AIF/modelisationProgrammation/test/data/basket_1.dat");
+
+
+    double prix1;
+    double ic1;
+    mc->price(prix1,ic1);
+
+    double erreur = fabs( prix1 - 13.616294)/prix1;
+    bool b = (erreur < 0.05 );
+    EXPECT_TRUE(b);
+
+    //delete mc;
+}
+
+
 int main(int argc, char **argv) {
   testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();
