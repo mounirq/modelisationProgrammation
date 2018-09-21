@@ -47,7 +47,8 @@ TEST_F(MonteCarloTest, test_price_basket){
     EXPECT_TRUE(b);
     PnlVect *delta = pnl_vect_create_from_scalar(size, 1);
     PnlMat *past = pnl_mat_create_from_scalar(size, nbTimeSteps+1, 100);
-    mc->delta(past, 0, delta);
+    PnlVect * icDelta = pnl_vect_create_from_scalar(size, 0);
+    mc->delta(past, 0, delta, icDelta);
 
     pnl_vect_free(&initialSpots);
     pnl_vect_free(&volatilities);

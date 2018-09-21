@@ -10,14 +10,14 @@ using namespace std;
 
 int main(int argc, char **argv)
 {
-    int size = 40;
+    int size = 2;
     double strike = 100.0;
-    PnlVect* initialSpots = pnl_vect_create_from_scalar(40,100);
+    PnlVect* initialSpots = pnl_vect_create_from_scalar(size,100);
     double maturity = 3;
-    PnlVect* volatilities = pnl_vect_create_from_scalar(40,0.2);
+    PnlVect* volatilities = pnl_vect_create_from_scalar(size,0.2);
     double intrestRate = 0.04879;
     double rho = 0.0;
-    PnlVect* weights = pnl_vect_create_from_scalar(40,0.025);
+    PnlVect* weights = pnl_vect_create_from_scalar(size,0.025);
     int nbTimeSteps = 1;
     BasketOption *optionBasket = new BasketOption(maturity, nbTimeSteps, size, strike, weights);
 
@@ -32,12 +32,11 @@ int main(int argc, char **argv)
 
     int nbSamples = 50000;
     PnlRandom * pnlRandom = new PnlRandom();
-    MonteCarlo *mc = new MonteCarlo(bs, optionBasket, pnlRandom, 0.01, nbSamples);
+    //MonteCarlo *mc = new MonteCarlo(bs, optionBasket, pnlRandom, 0.01, nbSamples);
 
     //construire MonteCarlo a partir du nom de fichier : cet appel compile mais ne marche pas
-//    MonteCarlo *mc1 = new MonteCarlo((char *)"../../data/basket_1.dat");
+    MonteCarlo *mc = new MonteCarlo((char *)"../../data/asian.dat");
 
-    MonteCarlo *mc1 = new MonteCarlo((char *) "../../data/basket_1.dat");
 
     mc->price(prix1,ic1);
     cout << "Le prix à t=0 est : " << prix1 << endl;
@@ -46,8 +45,9 @@ int main(int argc, char **argv)
 
     PnlVect *delta = pnl_vect_create_from_scalar(size, 1);
     PnlMat *past = pnl_mat_create_from_scalar(size, nbTimeSteps+1, 100);
-    mc->delta(past, 0, delta);
-
+    PnlVect * icDelta = pnl_vect_create_from_scalar(size, 0);
+    mc->delta(past, 0, delta, icDelta);
+    pnl_vect_print(icDelta);
 //    pnl_vect_print(delta);
 
     pnl_vect_free(&initialSpots);

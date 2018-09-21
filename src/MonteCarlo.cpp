@@ -129,18 +129,20 @@ void MonteCarlo::price(const PnlMat *past, double t, double &prix, double &ic)
     }
     prix = (exp(-mod_->r_ * opt_->T_)/nbSamples_) * sum;
 
-    double varApprochee = exp(- 2 * mod_->r_ * opt_->T_) * ( ((1.0/nbSamples_) * icSum) - ((1.0/nbSamples_) * sum) * ((1.0/nbSamples_) * sum) );
+    double varApprochee = exp(- 2 * mod_->r_ * (opt_->T_ - t)) * ( ((1.0/nbSamples_) * icSum) - ((1.0/nbSamples_) * sum) * ((1.0/nbSamples_) * sum) );
     ic = 2 * 1.96 * sqrt(varApprochee/nbSamples_);
 
     pnl_mat_free(&path);
 }
 
-void MonteCarlo::delta(const PnlMat *past, double t, PnlVect *delta) {
+void MonteCarlo::delta(const PnlMat *past, double t, PnlVect *delta, PnlVect *icDelta) {
     int nbActifs = mod_->size_;
     PnlMat *shift_plus_path = pnl_mat_create_from_scalar(opt_->nbTimeSteps_ + 1, nbActifs, 0);
     PnlMat *shift_moins_path = pnl_mat_create_from_scalar(opt_->nbTimeSteps_ + 1, nbActifs, 0);
     PnlMat *path = pnl_mat_create_from_scalar(opt_->nbTimeSteps_ + 1, nbActifs, 0);
     PnlVect *vect_sum = pnl_vect_create_from_scalar(nbActifs, 0);
+    PnlVect *sum = pnl_vect_create_from_scalar(nbActifs, 0);
+    PnlVect *icSum = pnl_vect_create_from_scalar(nbActifs, 0);
 
     double deltaAttendu = 0;
 
@@ -160,22 +162,36 @@ void MonteCarlo::delta(const PnlMat *past, double t, PnlVect *delta) {
 
             mod_->shiftAsset(shift_moins_path, path, d, -fdStep_, t, timeStep);
 
+            pnl_vect_set(sum, d, pnl_vect_get(sum,d) + opt_->payoff(shift_plus_path) - opt_->payoff(shift_moins_path));
+
+            pnl_vect_set(icSum, d, pnl_vect_get(icSum,d) + (opt_->payoff(shift_plus_path) - opt_->payoff(shift_moins_path)) * (opt_->payoff(shift_plus_path) - opt_->payoff(shift_moins_path)));
+
             pnl_vect_set(vect_sum, d, pnl_vect_get(vect_sum, d) + opt_->payoff(shift_plus_path) - opt_->payoff(shift_moins_path));
         }
     }
 
+    double tmpValueForIC = 0;
+    int sizePast = past->m;
+
     for (int d = 0; d < nbActifs; d++) {
         if (t == 0) {
+            tmpValueForIC = exp(- 2 * mod_->r_ * (opt_->T_ - t))/((2*fdStep_*pnl_vect_get(mod_->spot_,d))*(2*fdStep_*pnl_vect_get(mod_->spot_,d)));
+
             deltaAttendu = pnl_vect_get(vect_sum, d) * exp(-mod_->r_ * (opt_->T_ - t))/(2.0 * nbSamples_ * pnl_mat_get(path, 0, d)* fdStep_);
             pnl_vect_set(delta, d, deltaAttendu);
         } else {
+        	tmpValueForIC = exp(- 2 * mod_->r_ * (opt_->T_ - t))/((2*fdStep_*pnl_mat_get(past,sizePast-1,d))*(2*fdStep_*pnl_mat_get(past,sizePast-1,d)));
             pnl_vect_set(delta, d, pnl_vect_get(vect_sum, d) * exp(-mod_->r_ * (opt_->T_ - t))/(2.0 * nbSamples_ * pnl_mat_get(path, past->m - 1, d) * fdStep_));
         }
+        pnl_vect_set(icDelta, d, 1.96 * sqrt((tmpValueForIC * (1.0*pnl_vect_get(icSum, d)/nbSamples_ - (1.0*pnl_vect_get(sum, d)/nbSamples_)*(1.0*pnl_vect_get(sum, d)/nbSamples_) ))/nbSamples_ ));
+
     }
     pnl_mat_free(&shift_plus_path);
     pnl_mat_free(&shift_moins_path);
     pnl_mat_free(&path);
     pnl_vect_free(&vect_sum);
+    pnl_vect_free(&sum);
+    pnl_vect_free(&icSum);
 }
 
 void MonteCarlo::profits_and_losses(const PnlMat *market_trajectory, double &p_and_l)
@@ -204,7 +220,7 @@ void MonteCarlo::profits_and_losses(const PnlMat *market_trajectory, double &p_a
     double v = 0;
     price(prix, ic);
     double prix0 = prix;
-    delta(past, 0, deltas); //a t=0 past n'est pas utilisé dans le calcul des deltas
+    delta(past, 0, deltas, ics); //a t=0 past n'est pas utilisé dans le calcul des deltas
 
     //calcul de V(0)
     v = prix - pnl_vect_scalar_prod(deltas, spots);
@@ -243,7 +259,7 @@ void MonteCarlo::profits_and_losses(const PnlMat *market_trajectory, double &p_a
 
         // diff_delta = delta(i) - delta(i-1)
         pnl_vect_clone(prev_delta, deltas);
-        delta(sub_past, i*step_for_delta, deltas);
+        delta(sub_past, i*step_for_delta, deltas, ics);
         pnl_vect_clone(diff_delta, deltas);
         pnl_vect_minus_vect(diff_delta, prev_delta);
 
