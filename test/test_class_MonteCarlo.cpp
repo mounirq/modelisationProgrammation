@@ -63,41 +63,7 @@ TEST_F(MonteCarloTest, test_price_basket){
 }
 
 
-
-TEST_F(MonteCarloTest, test_price_asian){
-
-    int size = 2;
-    double strike = 100.0;
-    PnlVect* initialSpots = pnl_vect_create_from_scalar(2,100);
-    double maturity = 1.5;
-    PnlVect* volatilities = pnl_vect_create_from_scalar(2,0.2);
-    double intrestRate = 0.02;
-    double rho = 0.0;
-    PnlVect* weights = pnl_vect_create_from_scalar(2,0.5);
-    int nbTimeSteps = 150;
-    AsianOption *asianOption = new AsianOption(maturity, nbTimeSteps, size, strike, weights);
-    BlackScholesModel *blackScholesModel = new BlackScholesModel(size, intrestRate, rho, volatilities, initialSpots);
-    double prix1;
-    double ic1;
-    int nbSamples = 50000;
-    PnlRandom *rng = new PnlRandom();
-
-    MonteCarlo *monteCarlo = new MonteCarlo(blackScholesModel, asianOption, rng, 0.01, nbSamples);
-    monteCarlo->price(prix1,ic1);
-
-    double erreur = fabs( (prix1 - 4.67)/4.67);
-    bool b = (erreur < 0.1 );
-    EXPECT_TRUE(b);
-
-    pnl_vect_free(&initialSpots);
-    pnl_vect_free(&volatilities);
-    pnl_vect_free(&weights);
-
-    delete monteCarlo;
-}
-
-
-TEST_F(MonteCarloTest, test_price_basket_file){
+TEST_F(MonteCarloTest, test_price_basket_from_file){
 
     MonteCarlo *monteCarlo = new MonteCarlo((char *) "../data/basket_1.dat");
 
@@ -106,6 +72,36 @@ TEST_F(MonteCarloTest, test_price_basket_file){
     monteCarlo->price(prix1,ic1);
 
     double erreur = fabs( prix1 - 13.616294)/13.616294;
+    bool b = (erreur < 0.05 );
+    EXPECT_TRUE(b);
+
+    delete monteCarlo;
+}
+
+TEST_F(MonteCarloTest, test_price_asian_from_file){
+
+    MonteCarlo *monteCarlo = new MonteCarlo((char *) "../data/asian.dat");
+
+    double prix1;
+    double ic1;
+    monteCarlo->price(prix1,ic1);
+
+    double erreur = fabs( prix1 - 4.67)/4.67;
+    bool b = (erreur < 0.05 );
+    EXPECT_TRUE(b);
+
+    delete monteCarlo;
+}
+
+TEST_F(MonteCarloTest, test_price_performance_from_file){
+
+    MonteCarlo *monteCarlo = new MonteCarlo((char *) "../data/perf.dat");
+
+    double prix1;
+    double ic1;
+    monteCarlo->price(prix1,ic1);
+
+    double erreur = fabs( prix1 - 1.257353)/1.257353;
     bool b = (erreur < 0.05 );
     EXPECT_TRUE(b);
 
