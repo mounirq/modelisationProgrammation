@@ -61,7 +61,7 @@ add_subdirectory(src)
 add_subdirectory(test)
 
 # Tests
-add_test (NAME BlackScholesModel COMMAND test_class_BlackScholesModel)
+add_test (NAME BlackScholesModel COMMAND test_class_blackScholesModel)
 add_test(NAME AsionOption COMMAND test_class_asianOption)
 add_test (NAME BasketOption COMMAND test_class_basketOption)
 add_test (NAME PerformanceOption COMMAND test_class_performanceOption)

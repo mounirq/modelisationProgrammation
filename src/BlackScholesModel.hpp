@@ -14,6 +14,7 @@ public:
     double rho_; /// paramètre de corrélation
     PnlVect *sigma_; /// vecteur de volatilités
     PnlVect *spot_; /// valeurs initiales des sous-jacents
+    PnlVect * trend_; /// tendance du modèle
 
     /**
      * Génère une trajectoire du modèle et la stocke dans path
@@ -54,9 +55,14 @@ public:
      */
     void shiftAsset(PnlMat *shift_path, const PnlMat *path, int d, double h, double t, double timestep);
 
+    void simul_market(PnlMat * path, double T, int nbSteps, RandomGenerator * randomGenerator);
+
     BlackScholesModel();
 
     BlackScholesModel(int size, double r, double rho, PnlVect *sigma, PnlVect *spot);
+
+
+    BlackScholesModel(int size, double r, double rho, PnlVect *sigma, PnlVect *spot, PnlVect * trend);
 
     BlackScholesModel(const BlackScholesModel & blackScholesModel);
 
@@ -64,6 +70,7 @@ public:
 
 };
 
-void computeVect(PnlVect *vect, int size, PnlVect * previousSpots, double r, PnlVect *sigma, double variation, PnlVect * upperChol, PnlVect * gaussVect);
+void computeVect(PnlVect *vect, int size, PnlVect * previousSpots, double r, PnlVect *sigma, double variation, PnlMat * upperChol, PnlVect * gaussVect);
 
+void computeVectMarket(PnlVect *vect, int size, PnlVect * previousSpots, PnlVect * r, PnlVect *sigma, double variation, PnlMat * upperChol, PnlVect * gaussVect);
 
