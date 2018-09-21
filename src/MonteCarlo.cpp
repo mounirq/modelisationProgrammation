@@ -79,7 +79,7 @@ MonteCarlo::MonteCarlo(BlackScholesModel *mod, Option *opt, RandomGenerator *rng
 MonteCarlo::~MonteCarlo() {
     delete mod_;
     delete opt_;
-    pnl_rng_free(&rng_);
+    delete rng_;
 }
 
 void MonteCarlo::price(double &prix, double &ic)
