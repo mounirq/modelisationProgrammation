@@ -5,6 +5,10 @@
 #include "../src/BlackScholesModel.hpp"
 #include <math.h>
 
+#include <unistd.h>
+#define GetCurrentDir getcwd
+#include<iostream>
+
 class MonteCarloTest: public ::testing::Test {
  protected:
   virtual void SetUp() {
@@ -15,6 +19,14 @@ class MonteCarloTest: public ::testing::Test {
     // (right before the destructor).
   }
 };
+
+
+std::string GetCurrentWorkingDir( void ) {
+    char buff[FILENAME_MAX];
+    GetCurrentDir( buff, FILENAME_MAX );
+    std::string current_working_dir(buff);
+    return current_working_dir;
+}
 
 TEST_F(MonteCarloTest, test_price_basket){
     int size = 40;
@@ -28,90 +40,71 @@ TEST_F(MonteCarloTest, test_price_basket){
     int nbTimeSteps = 1;
     BasketOption *optionBasket = new BasketOption(maturity, nbTimeSteps, size, strike, weights);
 
-    BlackScholesModel *bs = new BlackScholesModel(size, intrestRate, rho, volatilities, initialSpots);
-
-    PnlRng *rng = pnl_rng_create(PNL_RNG_MERSENNE);
-
-    pnl_rng_sseed(rng, time(NULL));
+    BlackScholesModel *blackScholesModel = new BlackScholesModel(size, intrestRate, rho, volatilities, initialSpots);
 
     double prix1;
     double ic1;
 
     int nbSamples = 50000;
     PnlRandom * pnlRandom = new PnlRandom();
-    MonteCarlo *mc = new MonteCarlo(bs, optionBasket, pnlRandom, 0.01, nbSamples);
+    MonteCarlo *monteCarlo = new MonteCarlo(blackScholesModel, optionBasket, pnlRandom, 0.01, nbSamples);
 
-    mc->price(prix1,ic1);
-    double erreur = fabs( prix1 - 7.79265);
-    bool b = (erreur = 0.001 );
+    monteCarlo->price(prix1,ic1);
+    double erreur = fabs( (prix1 - 13.627)/13.627);
+    bool b = (erreur < 0.1 );
     EXPECT_TRUE(b);
-    PnlVect *delta = pnl_vect_create_from_scalar(size, 1);
-    PnlMat *past = pnl_mat_create_from_scalar(size, nbTimeSteps+1, 100);
-    PnlVect * icDelta = pnl_vect_create_from_scalar(size, 0);
-    mc->delta(past, 0, delta, icDelta);
-
-    pnl_vect_free(&initialSpots);
-    pnl_vect_free(&volatilities);
-    pnl_vect_free(&weights);
-    pnl_rng_free(&rng);
-    pnl_vect_free(&delta);
-    pnl_mat_free(&past);
-
-    delete mc;
-    delete bs;
-    delete optionBasket;
-}
-
-
-TEST_F(MonteCarloTest, test_price_asian){
-
-    int size = 2;
-    double strike = 100.0;
-    PnlVect* initialSpots = pnl_vect_create_from_scalar(2,100);
-    double maturity = 1.5;
-    PnlVect* volatilities = pnl_vect_create_from_scalar(2,0.2);
-    double intrestRate = 0.02;
-    double rho = 0.0;
-    PnlVect* weights = pnl_vect_create_from_scalar(2,0.5);
-    int nbTimeSteps = 150;
-    AsianOption *asianOption = new AsianOption(maturity, nbTimeSteps, size, strike, weights);
-    BlackScholesModel *bs = new BlackScholesModel(size, intrestRate, rho, volatilities, initialSpots);
-    double prix1;
-    double ic1;
-    int nbSamples = 50000;
-    PnlRandom *rng = new PnlRandom();
-
-    MonteCarlo *mc = new MonteCarlo(bs, asianOption, rng, 0.01, nbSamples);
-    mc->price(prix1,ic1);
-
-    double erreur = fabs( prix1 - 4.75729);
-    bool b = (erreur = 0.001 );
-    EXPECT_TRUE(b);
-
     pnl_vect_free(&initialSpots);
     pnl_vect_free(&volatilities);
     pnl_vect_free(&weights);
 
-    delete mc;
-    delete bs;
-    delete asianOption;
+    delete monteCarlo;
 
 }
 
-TEST_F(MonteCarloTest, test_price_basket_file){
 
-    MonteCarlo *mc = new MonteCarlo((char *) "/user/2/.base/errounda/home/3AIF/modelisationProgrammation/test/data/basket_1.dat");
+TEST_F(MonteCarloTest, test_price_basket_from_file){
 
+    MonteCarlo *monteCarlo = new MonteCarlo((char *) "../data/basket_1.dat");
 
     double prix1;
     double ic1;
-    mc->price(prix1,ic1);
+    monteCarlo->price(prix1,ic1);
 
-    double erreur = fabs( prix1 - 13.616294)/prix1;
+    double erreur = fabs( prix1 - 13.616294)/13.616294;
     bool b = (erreur < 0.05 );
     EXPECT_TRUE(b);
 
-    //delete mc;
+    delete monteCarlo;
+}
+
+TEST_F(MonteCarloTest, test_price_asian_from_file){
+
+    MonteCarlo *monteCarlo = new MonteCarlo((char *) "../data/asian.dat");
+
+    double prix1;
+    double ic1;
+    monteCarlo->price(prix1,ic1);
+
+    double erreur = fabs( prix1 - 4.67)/4.67;
+    bool b = (erreur < 0.05 );
+    EXPECT_TRUE(b);
+
+    delete monteCarlo;
+}
+
+TEST_F(MonteCarloTest, test_price_performance_from_file){
+
+    MonteCarlo *monteCarlo = new MonteCarlo((char *) "../data/perf.dat");
+
+    double prix1;
+    double ic1;
+    monteCarlo->price(prix1,ic1);
+
+    double erreur = fabs( prix1 - 1.257353)/1.257353;
+    bool b = (erreur < 0.05 );
+    EXPECT_TRUE(b);
+
+    delete monteCarlo;
 }
 
 
