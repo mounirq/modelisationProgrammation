@@ -42,7 +42,7 @@ void PricerBS::price(const PnlMat *past, double t, double &prix, double &ic)
 //    prix = pnl_bs_call(S0, ((BasketOption*)opt_)->strike_, opt_->T_, mod_->r_, 0, sigma);
 }
 
-void PricerBS::delta(const PnlMat *past, double t, PnlVect *delta)
+void PricerBS::delta(const PnlMat *past, double t, PnlVect *delta, PnlVect* icDelta)
 {
     int size_past = past->m;
     double S0 = pnl_mat_get(past, size_past-1, 0);

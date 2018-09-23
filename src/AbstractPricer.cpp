@@ -76,7 +76,7 @@ AbstractPricer::AbstractPricer(char *fileName) {
     delete P;
 }
 
-void AbstractPricer::delta(const PnlMat *past, double t, PnlVect *delta) {}
+void AbstractPricer::delta(const PnlMat *past, double t, PnlVect *delta, PnlVect *icDelta) {}
 
 void AbstractPricer::price(double &prix, double &ic) {}
 

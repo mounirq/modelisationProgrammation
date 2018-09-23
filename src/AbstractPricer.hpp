@@ -49,7 +49,7 @@ public:
      * @param[out] delta contient le vecteur de delta
      * de confiance sur le calcul du delta
      */
-    virtual void delta(const PnlMat *past, double t, PnlVect *delta);
+    virtual void delta(const PnlMat *past, double t, PnlVect *delta, PnlVect *icDelta);
 
     virtual ~AbstractPricer();
 };

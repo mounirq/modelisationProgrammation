@@ -43,7 +43,7 @@ void Couverture::profits_and_losses(const PnlMat *market_trajectory, double &p_a
     double v = 0;
     pricer_->price(prix, ic);
     double prix0 = prix;
-    pricer_->delta(sub_past, 0, deltas);
+    pricer_->delta(sub_past, 0, deltas, ics);
 
     std::cout << "----------" << std::endl;
     std::cout << "Le prix à 0 est : " << prix << std::endl;
@@ -85,7 +85,7 @@ void Couverture::profits_and_losses(const PnlMat *market_trajectory, double &p_a
 
         // diff_delta = delta(i) - delta(i-1)
         pnl_vect_clone(prev_delta, deltas);
-        pricer_->delta(sub_past, i*step_for_delta, deltas);
+        pricer_->delta(sub_past, i*step_for_delta, deltas, ics);
         pnl_vect_clone(diff_delta, deltas);
         pnl_vect_minus_vect(diff_delta, prev_delta);
 

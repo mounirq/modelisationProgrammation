@@ -27,7 +27,7 @@ void PricerMC::price(const PnlMat *past, double t, double &prix, double &ic)
     mc_->price(past, t, prix, ic);
 }
 
-void PricerMC::delta(const PnlMat *past, double t, PnlVect *delta)
+void PricerMC::delta(const PnlMat *past, double t, PnlVect *delta, PnlVect *icDelta)
 {
-    mc_->delta(past, t, delta);
+    mc_->delta(past, t, delta, icDelta);
 }
