@@ -5,6 +5,8 @@
 #include "../src/BasketOption.hpp"
 #include "../src/BlackScholesModel.hpp"
 #include "../src/MonteCarlo.hpp"
+#include "../src/PricerMC.hpp"
+#include "../src/Couverture.hpp"
 
 using namespace std;
 
@@ -18,6 +20,7 @@ int main(int argc, char **argv) {
     double rho = 0.0;
     PnlVect *weights = pnl_vect_create_from_scalar(5, 0.2);
     int nbTimeSteps = 1;
+
     BasketOption *optionBasket = new BasketOption(maturity, nbTimeSteps, size, strike, weights);
 
     BlackScholesModel *bs = new BlackScholesModel(size, intrestRate, rho, volatilities, initialSpots);
@@ -25,24 +28,31 @@ int main(int argc, char **argv) {
     double prix1;
     double ic1;
 
-    int nbSamples = 10000;
+    int nbSamples = 50000;
 
     PnlMat *market_trajectory = pnl_mat_create_from_file((char *)"../../data/market-data/simul_basket.dat");
 
     //cout << "hell : " << market_trajectory->m << endl;
     PnlRandom * rng = new PnlRandom();
-    MonteCarlo *mc = new MonteCarlo(bs, optionBasket, rng, 0.01, nbSamples);
+
+    PricerMC *pricer = new PricerMC(bs, optionBasket, rng, 0.01, nbSamples);
+
+    Couverture *couverture = new Couverture(pricer);
 
 
     double p_and_l;
-    mc->profits_and_losses(market_trajectory, p_and_l);
-    cout << "Le P&L est : " << p_and_l << endl;
+//    mc->profits_and_losses(market_trajectory, p_and_l);
+//    cout << "Le P&L est : " << p_and_l << endl;
 
+    couverture->profits_and_losses(market_trajectory, p_and_l);
+    cout << "Le P&L est : " << p_and_l << endl;
 
     pnl_vect_free(&initialSpots);
     pnl_vect_free(&volatilities);
     pnl_vect_free(&weights);
-    delete &rng;
+    delete rng;
+    delete pricer;
+    delete couverture;
     pnl_mat_free(&market_trajectory);
 //    delete optionBasket;
 //    delete bs;

@@ -7,7 +7,7 @@ target_link_libraries(test_mc_delta prng ${LIBS})
 add_executable(mc-price-basket test_mc_price_basket.cpp)
 target_link_libraries(mc-price-basket jl_parser prng ${LIBS})
 
-add_executable(mc-price-asian test_mc_price_asian.cpp)
+add_executable(mc-price-asian test_mc_price_asian.cpp test_PL_couverture.cpp)
 target_link_libraries(mc-price-asian jl_parser prng ${LIBS})
 
 add_executable(test_class_blackScholesModel test_class_blackScholesModel.cpp)
@@ -25,5 +25,11 @@ target_link_libraries(test_class_performanceOption prng gtest ${LIBS})
 add_executable(test_pl_basket test_PL_basket.cpp)
 target_link_libraries(test_pl_basket prng ${LIBS})
 
+add_executable(test_pl_couverture test_PL_couverture.cpp)
+target_link_libraries(test_pl_couverture prng ${LIBS})
+
 add_executable(test_class_FakeRandom test_class_FakeRandom.cpp)
 target_link_libraries(test_class_FakeRandom prng gtest ${LIBS})
+
+add_executable(test_class_MonteCarlo test_class_MonteCarlo.cpp)
+target_link_libraries(test_class_MonteCarlo prng gtest ${LIBS})

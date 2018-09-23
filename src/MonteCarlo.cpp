@@ -97,8 +97,6 @@ void MonteCarlo::price(double &prix, double &ic)
 
     ic = 2 * 1.96 * sqrt(varApprochee/nbSamples_);
 
-    std::cout << "standard deviation Approchee : " << sqrt(varApprochee/nbSamples_) << std::endl;
-
     pnl_mat_free(&path);
 
 }
@@ -161,7 +159,7 @@ void MonteCarlo::delta(const PnlMat *past, double t, PnlVect *delta) {
             deltaAttendu = pnl_vect_get(vect_sum, d) * exp(-mod_->r_ * (opt_->T_ - t))/(2.0 * nbSamples_ * pnl_mat_get(path, 0, d)* fdStep_);
             pnl_vect_set(delta, d, deltaAttendu);
         } else {
-            pnl_vect_set(delta, d, pnl_vect_get(vect_sum, d) * exp(-mod_->r_ * (opt_->T_ - t))/(2.0 * nbSamples_ * pnl_mat_get(path, past->m - 1, d) * fdStep_));
+            pnl_vect_set(delta, d, pnl_vect_get(vect_sum, d) * exp(-mod_->r_ * (opt_->T_ - t))/(2.0 * nbSamples_ * pnl_mat_get(past, past->m - 1, d) * fdStep_));
         }
     }
     pnl_mat_free(&shift_plus_path);
@@ -265,6 +263,4 @@ void MonteCarlo::profits_and_losses(const PnlMat *market_trajectory, double &p_a
     pnl_vect_free(&tmp_row);
     pnl_mat_free(&sub_past);
     pnl_mat_free(&past);
-
-
 }

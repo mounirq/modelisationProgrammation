@@ -66,6 +66,7 @@ add_test(NAME AsionOption COMMAND test_class_asianOption)
 add_test (NAME BasketOption COMMAND test_class_basketOption)
 add_test (NAME PerformanceOption COMMAND test_class_performanceOption)
 add_test (NAME FakeRandom COMMAND test_class_FakeRandom)
+add_test (NAME monteCarlo COMMAND test_class_MonteCarlo)
 
 # Print compiler flags
 get_directory_property(DirDefs COMPILE_DEFINITIONS)

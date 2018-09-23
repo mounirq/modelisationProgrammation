@@ -1,14 +1,21 @@
 #ifndef PROJETPRICERGIT_ABSTRACTPRICER_H
 #define PROJETPRICERGIT_ABSTRACTPRICER_H
 
+#include <iostream>
+#include <string>
+#include "jlparser/parser.hpp"
+#include "BasketOption.hpp"
+#include "AsianOption.hpp"
+#include "PerformanceOption.hpp"
 
 #include "BlackScholesModel.hpp"
 #include "Option.hpp"
+#include "pnl/pnl_finance.h"
+#include "pnl/pnl_vector.h"
 
 class AbstractPricer {
 
 public:
-
 
     BlackScholesModel *mod_; /*! pointeur vers le modèle */
     Option *opt_; /*! pointeur sur l'option */
@@ -16,9 +23,8 @@ public:
     double fdStep_; /*! pas de différence finie */
     size_t nbSamples_; /*! nombre de tirages Monte Carlo */
 
-    AbstractPricer();
-//    AbstractPricer(char *fileName);
-//    AbstractPricer(BlackScholesModel *model, Option *option, PnlRng *rng, double d, size_t i);
+    AbstractPricer(char *fileName);
+    AbstractPricer(BlackScholesModel *model, Option *option, RandomGenerator *rng, double d, size_t i);
 
     virtual void price(double &prix, double &ic);
 
@@ -44,15 +50,6 @@ public:
      * de confiance sur le calcul du delta
      */
     virtual void delta(const PnlMat *past, double t, PnlVect *delta);
-
-    /**
-     * Calcule le P&L a partir d'une trajectoire de marché donnée
-     *
-     * @param[in] market_trajectory contient la trajectoire du sous-jacent
-     * sur une grille de temps 0 à T
-     * @param[out] p_and_l  contient l'erreur de couverture
-     */
-    void profits_and_losses(const PnlMat *market_trajectory, double &p_and_l);
 
     virtual ~AbstractPricer();
 };

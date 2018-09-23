@@ -67,39 +67,6 @@ BlackScholesModel::~BlackScholesModel()
 	pnl_vect_free(&trend_);
 }
 
-void computeVect(PnlVect* vect, int size, PnlVect * previousSpots, double r, PnlVect *sigma, double variation, PnlMat * cholMat, PnlVect * gaussVect)
-{
-
-	//double scalarCholGauss = pnl_vect_scalar_prod(upperChol, gaussVect);
-	//PnlVect * vect = pnl_vect_create_from_scalar(size, 0);
-	PnlVect * lineChol = pnl_vect_create_from_scalar(size, 0);
-	double scalarCholGauss = 0;
-	double tmp = 0;
-	double expResult = 0;
-	double result = 0;
-	for (int i=0; i<size; i++)
-	{
-		pnl_mat_get_row(lineChol, cholMat, i);
-		scalarCholGauss = pnl_vect_scalar_prod(lineChol, gaussVect);
-
-		//tmp = (r - (sigma[i]*sigma[i]/2))*variation + sigma[i] * scalarCholGauss * sqrt(variation);
-		tmp = (r - (pnl_vect_get(sigma, i)*pnl_vect_get(sigma, i)/2))*variation + pnl_vect_get(sigma, i) * scalarCholGauss * sqrt(variation);
-
-		expResult = exp(tmp);
-
-		//result = previousSpots[i] * expResult;
-		result = pnl_vect_get(previousSpots, i) * expResult;
-
-		//vect[i] = result;
-		pnl_vect_set(vect, i, result);
-
-	}
-	//Free
-	pnl_vect_free(&lineChol);
-
-
-}
-
 void BlackScholesModel::asset(PnlMat *path, double T, int nbTimeSteps, RandomGenerator *randomGenerator)
 {
 	double timeVariation = T/nbTimeSteps;
@@ -124,12 +91,13 @@ void BlackScholesModel::asset(PnlMat *path, double T, int nbTimeSteps, RandomGen
 
 	// Start of trajectory generation
 	pnl_mat_set_row(path, spot_, 0);
-
+	PnlVect * trend = pnl_vect_create_from_scalar(size_, r_);
 	for (int i=1; i<nbTimeSteps+1; i++)	{
 
 		pnl_mat_get_row(lineGauss, gaussMat, i-1);
 
-		computeVect(vectTmp, size_, previousSpots, r_, sigma_, timeVariation, corrMat, lineGauss);
+		//computeVect(vectTmp, size_, previousSpots, r_, sigma_, timeVariation, corrMat, lineGauss);
+		computeVectMarket(vectTmp, size_, previousSpots, trend, sigma_, timeVariation, corrMat, lineGauss);
 		//pnl_mat_print(corrMat);
 
 		pnl_mat_set_row(path, vectTmp, i);
@@ -143,6 +111,7 @@ void BlackScholesModel::asset(PnlMat *path, double T, int nbTimeSteps, RandomGen
 	pnl_vect_free(&vectTmp);
 	pnl_vect_free(&previousSpots);
 	pnl_vect_free(&lineGauss);
+	pnl_vect_free(&trend);
 }
 
 void BlackScholesModel::asset(PnlMat *path, double t, double T, int nbTimeSteps, RandomGenerator *randomGenerator, const PnlMat *past)
@@ -193,11 +162,14 @@ void BlackScholesModel::asset(PnlMat *path, double t, double T, int nbTimeSteps,
 	PnlVect * lineGauss = pnl_vect_create_from_scalar(size_, 0);
 
 	int beginning = (sizePast-1 > 1)? sizePast-1 : 1 ;
+	PnlVect * trend = pnl_vect_create_from_scalar(size_, r_);
+
 	for (int i=beginning; i<nbTimeSteps+1; i++)
 	{
 		timeVariation = timeI1 - timeI;
 		pnl_mat_get_row(lineGauss, gaussMat, i-(sizePast-1));
-		computeVect(vectTmp, size_, previousSpots, r_, sigma_, timeVariation, corrMat, lineGauss);
+		//computeVect(vectTmp, size_, previousSpots, r_, sigma_, timeVariation, corrMat, lineGauss);
+		computeVectMarket(vectTmp, size_, previousSpots, trend, sigma_, timeVariation, corrMat, lineGauss);
 		pnl_mat_set_row(path, vectTmp, i);
 		pnl_vect_clone(previousSpots, vectTmp);
 		timeI = timeI1;
@@ -209,6 +181,8 @@ void BlackScholesModel::asset(PnlMat *path, double t, double T, int nbTimeSteps,
 	pnl_mat_free(&corrMat);
 	pnl_mat_free(&gaussMat);
 	pnl_vect_free(&lineGauss);
+	pnl_vect_free(&trend);
+
 }
 
 void BlackScholesModel::shiftAsset(PnlMat *shift_path, const PnlMat *path, int d, double h, double t, double timestep)
