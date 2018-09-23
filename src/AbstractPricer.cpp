@@ -1,7 +1,3 @@
-//
-// Created by Yasmine Tidane on 21/09/2018.
-//
-
 #include <iostream>
 #include <jlparser/parser.hpp>
 #include "AbstractPricer.hpp"
@@ -21,7 +17,6 @@ AbstractPricer::AbstractPricer(BlackScholesModel *mod, Option *opt, RandomGenera
 AbstractPricer::AbstractPricer(char *fileName) {
     Param *P = new Parser(fileName);
 
-    size_t size1;
     int size;
     double r;
     double rho;

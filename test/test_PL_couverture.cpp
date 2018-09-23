@@ -12,10 +12,10 @@
 using namespace std;
 
 int main(int argc, char **argv) {
-    PnlMat *market_trajectory = pnl_mat_create_from_file((char *)"/home/mounirq/3A/market-soutenance/market_call.dat");
+    PnlMat *market_trajectory = pnl_mat_create_from_file((char *)"../../data/market-soutenance/market_call.dat");
 
-    PricerMC *pricerMC = new PricerMC((char *)"/home/mounirq/3A/data-soutenance/call.dat");
-    PricerBS *pricerBS = new PricerBS((char *)"/home/mounirq/3A/data-soutenance/call.dat");
+    PricerMC *pricerMC = new PricerMC((char *)"../../data/data-soutenance/call.dat");
+    PricerBS *pricerBS = new PricerBS((char *)"../../data/data-soutenance/call.dat");
 
 
     Couverture *couvertureMC = new Couverture(pricerMC);
