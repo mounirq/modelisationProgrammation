@@ -17,14 +17,18 @@ class AbstractPricer {
 
 public:
 
+    AbstractPricer();
+
     BlackScholesModel *mod_; /*! pointeur vers le modèle */
     Option *opt_; /*! pointeur sur l'option */
     RandomGenerator *rng_; /*! pointeur sur le générateur */
     double fdStep_; /*! pas de différence finie */
     size_t nbSamples_; /*! nombre de tirages Monte Carlo */
 
+    int H_;
+
     AbstractPricer(char *fileName);
-    AbstractPricer(BlackScholesModel *model, Option *option, RandomGenerator *rng, double d, size_t i);
+    AbstractPricer(BlackScholesModel *model, Option *option, RandomGenerator *rng, double d, size_t i, int H);
 
     virtual void price(double &prix, double &ic);
 

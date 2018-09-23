@@ -9,12 +9,13 @@
 
 AbstractPricer::~AbstractPricer() {}
 
-AbstractPricer::AbstractPricer(BlackScholesModel *mod, Option *opt, RandomGenerator *rng, double fdStep, size_t nbSamples) {
+AbstractPricer::AbstractPricer(BlackScholesModel *mod, Option *opt, RandomGenerator *rng, double fdStep, size_t nbSamples, int H) {
     mod_ = mod;
     opt_ = opt;
     rng_ = rng;
     fdStep_ = fdStep;
     nbSamples_ = nbSamples;
+    H_ = H;
 }
 
 AbstractPricer::AbstractPricer(char *fileName) {
@@ -25,7 +26,19 @@ AbstractPricer::AbstractPricer(char *fileName) {
     double r;
     double rho;
     PnlVect *sigma, *spot;
-    fdStep_ = 0.1;
+
+    bool fdStepAvailable = P->extract("fdStep", fdStep_, true);
+    if (!fdStepAvailable)
+    {
+        fdStep_ = 0.1;
+    }
+
+    bool H_Available = P->extract("hedging dates", H_, true);
+    if (!H_Available)
+    {
+        H_ = 0;
+    }
+
 
     P->extract("sample number", this->nbSamples_);
     P->extract("option size", size);
@@ -33,7 +46,19 @@ AbstractPricer::AbstractPricer(char *fileName) {
     P->extract("correlation", rho);
     P->extract("volatility", sigma, size);
     P->extract("spot", spot, size);
-    this->mod_ = new BlackScholesModel(size, r, rho, sigma, spot);
+
+    PnlVect *trend;
+    bool trendAvailable = P->extract("trend", trend, size, true);
+
+    if (!trendAvailable)
+    {
+        this->mod_ = new BlackScholesModel(size, r, rho, sigma, spot);
+    }
+    else
+    {
+        this->mod_ = new BlackScholesModel(size, r, rho, sigma, spot, trend);
+    }
+
 
     double T;
     int nbTimeSteps;
@@ -43,13 +68,10 @@ AbstractPricer::AbstractPricer(char *fileName) {
 
     P->extract("maturity", T);
     P->extract("timestep number", nbTimeSteps);
+
     P->extract("payoff coefficients", weights, size);
-//    rng_ = pnl_rng_create(PNL_RNG_MERSENNE);
-//    pnl_rng_sseed(rng_, time(NULL));
 
     rng_ = new PnlRandom();
-
-    //decommenter les lignes commentees si l'option performance marche
 
     if (optionType.compare("performance") == 0 )
     {
@@ -81,3 +103,7 @@ void AbstractPricer::delta(const PnlMat *past, double t, PnlVect *delta, PnlVect
 void AbstractPricer::price(double &prix, double &ic) {}
 
 void AbstractPricer::price(const PnlMat *past, double t, double &prix, double &ic) {}
+
+AbstractPricer::AbstractPricer() {
+
+}

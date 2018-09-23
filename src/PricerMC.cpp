@@ -5,16 +5,18 @@ PricerMC::PricerMC(char *fileName) : AbstractPricer(fileName)
     mc_ = new MonteCarlo(mod_, opt_, rng_, fdStep_, nbSamples_);
 }
 
-PricerMC::PricerMC(BlackScholesModel *model, Option *option, RandomGenerator *rng, double fdStep, size_t nbSamples) : AbstractPricer(model, option, rng, fdStep, nbSamples)
+PricerMC::PricerMC(BlackScholesModel *model, Option *option, RandomGenerator *rng, double fdStep, size_t nbSamples, int H) : AbstractPricer(model, option, rng, fdStep, nbSamples, H)
 {
     mc_ = new MonteCarlo(mod_, opt_, rng_, fdStep_, nbSamples_);
 }
 
+PricerMC::PricerMC():AbstractPricer()
+{
+}
+
 PricerMC::~PricerMC()
 {
-    delete mod_;
-    delete opt_;
-    delete rng_;
+    delete mc_;
 }
 
 void PricerMC::price(double &prix, double &ic)

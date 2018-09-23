@@ -14,10 +14,12 @@ class PricerMC : public AbstractPricer
 public:
 
     MonteCarlo *mc_;
+//    RandomGenerator *rng_;
 
     ~PricerMC();
+    PricerMC();
     PricerMC(char *fileName);
-    PricerMC(BlackScholesModel *model, Option *option, RandomGenerator *rng, double fdStep, size_t nbSamples);
+    PricerMC(BlackScholesModel *model, Option *option, RandomGenerator *rng, double fdStep, size_t nbSamples, int H);
 
     void price(double &prix, double &ic);
 

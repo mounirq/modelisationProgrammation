@@ -13,7 +13,7 @@ Couverture::~Couverture() {
     delete pricer_;
 }
 
-void Couverture::profits_and_losses(const PnlMat *market_trajectory, double &p_and_l)
+void Couverture::profits_and_losses(const PnlMat *market_trajectory, double &p_and_l, double &pl_sur_P0)
 {
     int H = market_trajectory->m - 1;
     int nbAssets = market_trajectory->n;
@@ -66,7 +66,7 @@ void Couverture::profits_and_losses(const PnlMat *market_trajectory, double &p_a
 
     for (int i = 1; i<=H; i++){
 
-//        std::cout<< "Le t est = " << i << std::endl;
+        std::cout<< "Le t est = " << i << std::endl;
         //Mise à jour de la matrice past
         if (i%step_for_payoff == 0){
             pnl_mat_get_row(tmp_row, market_trajectory, i);
@@ -121,7 +121,8 @@ void Couverture::profits_and_losses(const PnlMat *market_trajectory, double &p_a
     std::cout << "Le spot H est: " << pnl_vect_get(spots, 0) << std::endl;
     std::cout << "Le payoff est: " << pricer_->opt_->payoff(past) << std::endl;
 
-    std::cout<< "Le PL/prix0 = " << p_and_l/prix0 << std::endl;
+    pl_sur_P0 = p_and_l/prix0;
+//    std::cout<< "Le PL/prix0 = " << pl_sur_P0 << std::endl;
 
     //Free
     pnl_vect_free(&vect_V);

@@ -8,6 +8,7 @@ class Couverture {
 public:
 
     AbstractPricer *pricer_;
+    int H_;
 
     Couverture(AbstractPricer *pricer_);
 
@@ -20,7 +21,7 @@ public:
      * sur une grille de temps 0 à T
      * @param[out] p_and_l  contient l'erreur de couverture
      */
-    void profits_and_losses(const PnlMat *market_trajectory, double &p_and_l);
+    void profits_and_losses(const PnlMat *market_trajectory, double &p_and_l, double &pl_sur_P0);
 
 };
 

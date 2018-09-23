@@ -184,99 +184,99 @@ void MonteCarlo::delta(const PnlMat *past, double t, PnlVect *delta, PnlVect *ic
     pnl_vect_free(&icSum);
 }
 
-void MonteCarlo::profits_and_losses(const PnlMat *market_trajectory, double &p_and_l)
-{
-    int H = market_trajectory->m;
-    int nbAssets = market_trajectory->n;
-
-    PnlVect *vect_V = pnl_vect_create_from_scalar(H, 0);
-
-    PnlVect *spots = pnl_vect_create_from_scalar(nbAssets, 0);
-    pnl_vect_clone(spots, mod_->spot_);
-
-    PnlMat *past = pnl_mat_create_from_scalar(opt_->nbTimeSteps_ + 1, nbAssets, 0);
-    PnlMat *sub_past = pnl_mat_new();
-
-    PnlVect *ics = pnl_vect_create_from_scalar(opt_->size_, 0); //pour les deltas
-
-    PnlVect *diff_delta = pnl_vect_create_from_scalar(opt_->size_, 0);
-    PnlVect *prev_delta = pnl_vect_create_from_scalar(nbAssets, 0);
-    PnlVect *deltas = pnl_vect_create_from_scalar(nbAssets, 0);
-
-    PnlVect *tmp_row = pnl_vect_create_from_scalar(nbAssets, 0);
-
-    double prix = 0;
-    double ic = 0;
-    double v = 0;
-    price(prix, ic);
-    double prix0 = prix;
-    delta(past, 0, deltas, ics); //a t=0 past n'est pas utilisé dans le calcul des deltas
-
-    //calcul de V(0)
-    v = prix - pnl_vect_scalar_prod(deltas, spots);
-    pnl_vect_set(vect_V, 0, v);
-
-    double step_for_delta = opt_->T_ / H;  // T/H
-    double actualisationFactor = exp(mod_->r_ * step_for_delta);
-
-    int step_for_payoff = H/opt_->nbTimeSteps_; // H/N
-
-    double nbOfSpotsNeeded = 0;
-
-    pnl_mat_get_row(tmp_row, market_trajectory, 0);
-    pnl_mat_set_row(past, tmp_row, 0);
-
-    double index_row_to_fill = 1;
-
-    for (int i = 1; i<H; i++){
-
-//        std::cout<< "Le t est = " << i << std::endl;
-        //Mise à jour de la matrice past
-        if (i%step_for_payoff == 0){
-            pnl_mat_get_row(tmp_row, market_trajectory, step_for_payoff * index_row_to_fill);
-            pnl_mat_set_row(past, tmp_row, index_row_to_fill);
-            index_row_to_fill++;
-        }
-        else {
-            pnl_mat_get_row(tmp_row, market_trajectory, i);
-            pnl_mat_set_row(past, tmp_row, index_row_to_fill);
-        }
-
-        nbOfSpotsNeeded = ceil(((double)i)/(double)step_for_payoff) + 1;
-        pnl_mat_extract_subblock(sub_past, past, 0, nbOfSpotsNeeded, 0, nbAssets);
-//        std::cout<< "Le sub_past est = " << std::endl;
-//        pnl_mat_print(sub_past);
-
-        // diff_delta = delta(i) - delta(i-1)
-        pnl_vect_clone(prev_delta, deltas);
-        delta(sub_past, i*step_for_delta, deltas, ics);
-        pnl_vect_clone(diff_delta, deltas);
-        pnl_vect_minus_vect(diff_delta, prev_delta);
-
-        //spots = S(tho_i)
-        pnl_mat_get_row(spots, market_trajectory, i);
-
-        // v = V(i-1) * exp(rT/H) - (delta(i) - delta(i-1)) * S(tho_i)
-        v = pnl_vect_get(vect_V, i-1) * actualisationFactor - pnl_vect_scalar_prod(diff_delta, spots);
-        pnl_vect_set(vect_V, i, v);
-    }
-
-//    std::cout<< "Le past est = " << std::endl;
-//    pnl_mat_print(past);
-
-    // A la sortie de la boucle : deltas = delta(H) et spots = S(tho_H)
-    p_and_l = pnl_vect_get(vect_V, H-1) + pnl_vect_scalar_prod(deltas, spots) - opt_->payoff(past);
-
-    std::cout<< "Le PL/prix0 = " << p_and_l/prix0 << std::endl;
-
-    //Free
-    pnl_vect_free(&vect_V);
-    pnl_vect_free(&spots);
-    pnl_vect_free(&ics);
-    pnl_vect_free(&diff_delta);
-    pnl_vect_free(&prev_delta);
-    pnl_vect_free(&deltas);
-    pnl_vect_free(&tmp_row);
-    pnl_mat_free(&sub_past);
-    pnl_mat_free(&past);
-}
+//void MonteCarlo::profits_and_losses(const PnlMat *market_trajectory, double &p_and_l)
+//{
+//    int H = market_trajectory->m;
+//    int nbAssets = market_trajectory->n;
+//
+//    PnlVect *vect_V = pnl_vect_create_from_scalar(H, 0);
+//
+//    PnlVect *spots = pnl_vect_create_from_scalar(nbAssets, 0);
+//    pnl_vect_clone(spots, mod_->spot_);
+//
+//    PnlMat *past = pnl_mat_create_from_scalar(opt_->nbTimeSteps_ + 1, nbAssets, 0);
+//    PnlMat *sub_past = pnl_mat_new();
+//
+//    PnlVect *ics = pnl_vect_create_from_scalar(opt_->size_, 0); //pour les deltas
+//
+//    PnlVect *diff_delta = pnl_vect_create_from_scalar(opt_->size_, 0);
+//    PnlVect *prev_delta = pnl_vect_create_from_scalar(nbAssets, 0);
+//    PnlVect *deltas = pnl_vect_create_from_scalar(nbAssets, 0);
+//
+//    PnlVect *tmp_row = pnl_vect_create_from_scalar(nbAssets, 0);
+//
+//    double prix = 0;
+//    double ic = 0;
+//    double v = 0;
+//    price(prix, ic);
+//    double prix0 = prix;
+//    delta(past, 0, deltas, ics); //a t=0 past n'est pas utilisé dans le calcul des deltas
+//
+//    //calcul de V(0)
+//    v = prix - pnl_vect_scalar_prod(deltas, spots);
+//    pnl_vect_set(vect_V, 0, v);
+//
+//    double step_for_delta = opt_->T_ / H;  // T/H
+//    double actualisationFactor = exp(mod_->r_ * step_for_delta);
+//
+//    int step_for_payoff = H/opt_->nbTimeSteps_; // H/N
+//
+//    double nbOfSpotsNeeded = 0;
+//
+//    pnl_mat_get_row(tmp_row, market_trajectory, 0);
+//    pnl_mat_set_row(past, tmp_row, 0);
+//
+//    double index_row_to_fill = 1;
+//
+//    for (int i = 1; i<H; i++){
+//
+////        std::cout<< "Le t est = " << i << std::endl;
+//        //Mise à jour de la matrice past
+//        if (i%step_for_payoff == 0){
+//            pnl_mat_get_row(tmp_row, market_trajectory, step_for_payoff * index_row_to_fill);
+//            pnl_mat_set_row(past, tmp_row, index_row_to_fill);
+//            index_row_to_fill++;
+//        }
+//        else {
+//            pnl_mat_get_row(tmp_row, market_trajectory, i);
+//            pnl_mat_set_row(past, tmp_row, index_row_to_fill);
+//        }
+//
+//        nbOfSpotsNeeded = ceil(((double)i)/(double)step_for_payoff) + 1;
+//        pnl_mat_extract_subblock(sub_past, past, 0, nbOfSpotsNeeded, 0, nbAssets);
+////        std::cout<< "Le sub_past est = " << std::endl;
+////        pnl_mat_print(sub_past);
+//
+//        // diff_delta = delta(i) - delta(i-1)
+//        pnl_vect_clone(prev_delta, deltas);
+//        delta(sub_past, i*step_for_delta, deltas, ics);
+//        pnl_vect_clone(diff_delta, deltas);
+//        pnl_vect_minus_vect(diff_delta, prev_delta);
+//
+//        //spots = S(tho_i)
+//        pnl_mat_get_row(spots, market_trajectory, i);
+//
+//        // v = V(i-1) * exp(rT/H) - (delta(i) - delta(i-1)) * S(tho_i)
+//        v = pnl_vect_get(vect_V, i-1) * actualisationFactor - pnl_vect_scalar_prod(diff_delta, spots);
+//        pnl_vect_set(vect_V, i, v);
+//    }
+//
+////    std::cout<< "Le past est = " << std::endl;
+////    pnl_mat_print(past);
+//
+//    // A la sortie de la boucle : deltas = delta(H) et spots = S(tho_H)
+//    p_and_l = pnl_vect_get(vect_V, H-1) + pnl_vect_scalar_prod(deltas, spots) - opt_->payoff(past);
+//
+//    std::cout<< "Le PL/prix0 = " << p_and_l/prix0 << std::endl;
+//
+//    //Free
+//    pnl_vect_free(&vect_V);
+//    pnl_vect_free(&spots);
+//    pnl_vect_free(&ics);
+//    pnl_vect_free(&diff_delta);
+//    pnl_vect_free(&prev_delta);
+//    pnl_vect_free(&deltas);
+//    pnl_vect_free(&tmp_row);
+//    pnl_mat_free(&sub_past);
+//    pnl_mat_free(&past);
+//}
