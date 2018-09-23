@@ -24,7 +24,7 @@ public:
      * @param[in] T  maturité
      * @param[in] nbTimeSteps nombre de dates de constatation
      */
-    void asset(PnlMat *path, double T, int nbTimeSteps, RandomGenerator *randomGenerator, PnlMat *corrMat);
+    void asset(PnlMat *path, double T, int nbTimeSteps, RandomGenerator *randomGenerator);
 
     /**
      * Calcule une trajectoire du sous-jacent connaissant le
@@ -38,7 +38,7 @@ public:
      * @param[in] T date jusqu'à laquelle on simule la trajectoire
      * @param[in] past trajectoire réalisée jusqu'a la date t
      */
-    void asset(PnlMat *path, double t, double T, int nbTimeSteps, RandomGenerator *randomGenerator, const PnlMat *past, PnlMat * corrMat);
+    void asset(PnlMat *path, double t, double T, int nbTimeSteps, RandomGenerator *randomGenerator, const PnlMat *past);
 
     /**
      * Shift d'une trajectoire du sous-jacent

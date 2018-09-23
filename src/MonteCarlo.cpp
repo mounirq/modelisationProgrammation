@@ -14,7 +14,7 @@ MonteCarlo::MonteCarlo(char *fileName)
     int size;
     double r;
     double rho;
-    PnlVect *sigma, *spot, *trend;
+    PnlVect *sigma, *spot;
     fdStep_ = 0.1;
 
     P->extract("sample number", this->nbSamples_);
@@ -23,13 +23,7 @@ MonteCarlo::MonteCarlo(char *fileName)
     P->extract("correlation", rho);
     P->extract("volatility", sigma, size);
     P->extract("spot", spot, size);
-    bool trendAvaible = P->extract("trend", trend, size, true);
-    if(trendAvaible){
-        this->mod_ = new BlackScholesModel(size, r, rho, sigma, spot, trend);
-    }
-    else{
-        this->mod_ = new BlackScholesModel(size, r, rho, sigma, spot);
-    }
+    this->mod_ = new BlackScholesModel(size, r, rho, sigma, spot);
 
     double T;
     int nbTimeSteps;
@@ -40,13 +34,8 @@ MonteCarlo::MonteCarlo(char *fileName)
     P->extract("maturity", T);
     P->extract("timestep number", nbTimeSteps);
     P->extract("payoff coefficients", weights, size);
-//    rng_ = pnl_rng_create(PNL_RNG_MERSENNE);
-//    pnl_rng_sseed(rng_, time(NULL));
 
     rng_ = new PnlRandom();
-
-    //decommenter les lignes commentees si l'option performance marche
-
     if (optionType.compare("performance") == 0 )
     {
         this->opt_ = new PerformanceOption(T, nbTimeSteps, size, weights);
@@ -95,12 +84,10 @@ void MonteCarlo::price(double &prix, double &ic)
     double sum = 0;
     double icSum = 0;
     double payoffTmp = 0;
-	PnlMat * corrMat = pnl_mat_create_from_scalar(mod_->size_, mod_ ->size_, mod_ ->rho_);
-	pnl_mat_set_diag(corrMat,1, 0);
-	pnl_mat_chol(corrMat);
+
     for (int i=0 ; i<nbSamples_ ; i++)
     {
-        mod_->asset(path, opt_->T_, opt_->nbTimeSteps_, rng_, corrMat);
+        mod_->asset(path, opt_->T_, opt_->nbTimeSteps_, rng_);
 
         payoffTmp = opt_->payoff(path);
         sum += payoffTmp;
@@ -112,8 +99,6 @@ void MonteCarlo::price(double &prix, double &ic)
 
 
     ic = 2 * 1.96 * sqrt(varApprochee/nbSamples_);
-
-    std::cout << "standard deviation Approchee : " << sqrt(varApprochee/nbSamples_) << std::endl;
 
     pnl_mat_free(&path);
 
@@ -127,13 +112,10 @@ void MonteCarlo::price(const PnlMat *past, double t, double &prix, double &ic)
     double sum = 0;
     double icSum = 0;
     double payoffTmp = 0;
-	PnlMat * corrMat = pnl_mat_create_from_scalar(mod_->size_, mod_ ->size_, mod_ ->rho_);
-	pnl_mat_set_diag(corrMat,1, 0);
-	pnl_mat_chol(corrMat);
 
     for (int i=0 ; i<nbSamples_ ; i++)
     {
-        mod_->asset(path, t, opt_->T_, opt_->nbTimeSteps_, rng_, past, corrMat);
+        mod_->asset(path, t, opt_->T_, opt_->nbTimeSteps_, rng_, past);
         payoffTmp = opt_->payoff(path);
         sum += payoffTmp;
         icSum = payoffTmp * payoffTmp;
@@ -154,9 +136,6 @@ void MonteCarlo::delta(const PnlMat *past, double t, PnlVect *delta, PnlVect *ic
     PnlVect *vect_sum = pnl_vect_create_from_scalar(nbActifs, 0);
     PnlVect *sum = pnl_vect_create_from_scalar(nbActifs, 0);
     PnlVect *icSum = pnl_vect_create_from_scalar(nbActifs, 0);
-	PnlMat * corrMat = pnl_mat_create_from_scalar(mod_->size_, mod_ ->size_, mod_ ->rho_);
-	pnl_mat_set_diag(corrMat,1, 0);
-	pnl_mat_chol(corrMat);
 
     double deltaAttendu = 0;
 
@@ -165,9 +144,9 @@ void MonteCarlo::delta(const PnlMat *past, double t, PnlVect *delta, PnlVect *ic
     for (int j = 0; j < nbSamples_; j++) {
 
         if (t == 0) {
-            mod_->asset(path, opt_->T_, opt_->nbTimeSteps_, rng_, corrMat);
+            mod_->asset(path, opt_->T_, opt_->nbTimeSteps_, rng_);
         } else {
-            mod_->asset(path, t, opt_->T_, opt_->nbTimeSteps_, rng_, past, corrMat);
+            mod_->asset(path, t, opt_->T_, opt_->nbTimeSteps_, rng_, past);
         }
 
         for (int d = 0; d < nbActifs; d++) {
@@ -194,7 +173,7 @@ void MonteCarlo::delta(const PnlMat *past, double t, PnlVect *delta, PnlVect *ic
             deltaAttendu = pnl_vect_get(vect_sum, d) * exp(-mod_->r_ * (opt_->T_ - t))/(2.0 * nbSamples_ * pnl_mat_get(path, 0, d)* fdStep_);
             pnl_vect_set(delta, d, deltaAttendu);
         } else {
-        	tmpValueForIC = exp(- 2 * mod_->r_ * (opt_->T_ - t))/((2*fdStep_*pnl_mat_get(past,sizePast-1,d))*(2*fdStep_*pnl_mat_get(past,sizePast-1,d)));
+            tmpValueForIC = exp(- 2 * mod_->r_ * (opt_->T_ - t))/((2*fdStep_*pnl_mat_get(past,sizePast-1,d))*(2*fdStep_*pnl_mat_get(past,sizePast-1,d)));
             pnl_vect_set(delta, d, pnl_vect_get(vect_sum, d) * exp(-mod_->r_ * (opt_->T_ - t))/(2.0 * nbSamples_ * pnl_mat_get(path, past->m - 1, d) * fdStep_));
         }
         pnl_vect_set(icDelta, d, 1.96 * sqrt((tmpValueForIC * (1.0*pnl_vect_get(icSum, d)/nbSamples_ - (1.0*pnl_vect_get(sum, d)/nbSamples_)*(1.0*pnl_vect_get(sum, d)/nbSamples_) ))/nbSamples_ ));
