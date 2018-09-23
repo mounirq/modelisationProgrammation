@@ -56,7 +56,7 @@ TEST_F(MonteCarloTest, test_price_asian_file){
     double ic1;
     monteCarlo->price(asianOptionPrice,ic1);
 
-    double erreur = fabs( asianOptionPrice - 4.75729)/4.75729;
+    double erreur = fabs( asianOptionPrice - 4.67)/4.67;
     bool b = (erreur < 0.05 );
     EXPECT_TRUE(b);
 
@@ -156,4 +156,3 @@ int main(int argc, char **argv) {
     testing::InitGoogleTest(&argc, argv);
     return RUN_ALL_TESTS();
 }
-
