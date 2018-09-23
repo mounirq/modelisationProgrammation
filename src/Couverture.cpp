@@ -45,12 +45,6 @@ void Couverture::profits_and_losses(const PnlMat *market_trajectory, double &p_a
     double prix0 = prix;
     pricer_->delta(sub_past, 0, deltas, ics);
 
-    std::cout << "----------" << std::endl;
-    std::cout << "Le prix à 0 est : " << prix << std::endl;
-    std::cout << "Les deltas à 0 sont : " << std::endl;
-    pnl_vect_print(deltas);
-
-
     //calcul de V(0)
     v = prix - pnl_vect_scalar_prod(deltas, spots);
     pnl_vect_set(vect_V, 0, v);
@@ -66,7 +60,6 @@ void Couverture::profits_and_losses(const PnlMat *market_trajectory, double &p_a
 
     for (int i = 1; i<=H; i++){
 
-        std::cout<< "Le t est = " << i << std::endl;
         //Mise à jour de la matrice past
         if (i%step_for_payoff == 0){
             pnl_mat_get_row(tmp_row, market_trajectory, i);
@@ -80,8 +73,6 @@ void Couverture::profits_and_losses(const PnlMat *market_trajectory, double &p_a
 
         nbOfSpotsNeeded = ceil(((double)i)/(double)step_for_payoff) + 1;
         pnl_mat_extract_subblock(sub_past, past, 0, nbOfSpotsNeeded, 0, nbAssets);
-//        std::cout<< "Le sub_past est = " << std::endl;
-//        pnl_mat_print(sub_past);
 
         // diff_delta = delta(i) - delta(i-1)
         pnl_vect_clone(prev_delta, deltas);
@@ -89,41 +80,18 @@ void Couverture::profits_and_losses(const PnlMat *market_trajectory, double &p_a
         pnl_vect_clone(diff_delta, deltas);
         pnl_vect_minus_vect(diff_delta, prev_delta);
 
-//        std::cout << "----------" << std::endl;
-//        std::cout << "Les deltas à tho" << i << " sont : " << std::endl;
-//        pnl_vect_print(deltas);
-
         //spots = S(tho_i)
         pnl_mat_get_row(spots, market_trajectory, i);
 
         // v = V(i-1) * exp(rT/H) - (delta(i) - delta(i-1)) * S(tho_i)
         v = pnl_vect_get(vect_V, i-1) * actualisationFactor - pnl_vect_scalar_prod(diff_delta, spots);
         pnl_vect_set(vect_V, i, v);
-//        std::cout << "Le v" << i << " est: " << v << std::endl;
     }
-
-//    std::cout<< "Le past est = " << std::endl;
-//    pnl_mat_print(past);
-
-    std::cout << ">>>>>" << std::endl;
-
 
     // A la sortie de la boucle : deltas = delta(H) et spots = S(tho_H)
     p_and_l = pnl_vect_get(vect_V, H) + pnl_vect_scalar_prod(deltas, spots) - pricer_->opt_->payoff(past);
 
-//    pnl_mat_get_row(spots, market_trajectory, H-1);
-//    v = pnl_vect_get(vect_V, H-2) * actualisationFactor;
-//    pnl_vect_set(vect_V, H-1, v);
-//    p_and_l = pnl_vect_get(vect_V, H-1) + pnl_vect_scalar_prod(deltas, spots) - pricer_->opt_->payoff(past);
-
-    std::cout << "Le VH est: " << pnl_vect_get(vect_V, H-1) << std::endl;
-    std::cout << "Le deltaH est: " << pnl_vect_get(deltas, 0) << std::endl;
-    std::cout << "Le spot H est: " << pnl_vect_get(spots, 0) << std::endl;
-    std::cout << "Le payoff est: " << pricer_->opt_->payoff(past) << std::endl;
-
     pl_sur_P0 = p_and_l/prix0;
-//    std::cout<< "Le PL/prix0 = " << pl_sur_P0 << std::endl;
-
     //Free
     pnl_vect_free(&vect_V);
     pnl_vect_free(&spots);

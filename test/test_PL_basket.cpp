@@ -31,7 +31,7 @@ int main(int argc, char **argv) {
 //
 //    PnlRandom * rng = new PnlRandom();
 
-    PricerMC *pricer = new PricerMC("../../data/basket5.dat");
+    PricerMC *pricer = new PricerMC((char *) "../../data/basket5.dat");
 //    PricerMC *pricer = new PricerMC(bs, optionBasket, rng, 0.01, nbSamples);
 
     Couverture *couverture = new Couverture(pricer);

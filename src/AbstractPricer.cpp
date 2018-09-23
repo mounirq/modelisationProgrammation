@@ -27,16 +27,16 @@ AbstractPricer::AbstractPricer(char *fileName) {
     double rho;
     PnlVect *sigma, *spot;
 
-    bool fdStepAvailable = P->extract("fdStep", fdStep_, true);
+    bool fdStepAvailable = P->extract("fd step", fdStep_, true);
     if (!fdStepAvailable)
     {
         fdStep_ = 0.1;
     }
 
-    bool H_Available = P->extract("hedging dates", H_, true);
+    bool H_Available = P->extract("hedging dates number", H_, true);
     if (!H_Available)
     {
-        H_ = 0;
+        H_ = 150;
     }
 
 
@@ -67,7 +67,7 @@ AbstractPricer::AbstractPricer(char *fileName) {
     P->extract("option type", optionType);
 
     P->extract("maturity", T);
-    P->extract("timestep number", nbTimeSteps);
+    P->extract("TimeStep number", nbTimeSteps);
 
     P->extract("payoff coefficients", weights, size);
 
