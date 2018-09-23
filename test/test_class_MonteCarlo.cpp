@@ -19,7 +19,7 @@ protected:
 /* Test options price at t = 0 : */
 
 TEST_F(MonteCarloTest, test_price_basket_file){
-    MonteCarlo *monteCarlo = new MonteCarlo((char *) "../../data/basket.dat");
+    MonteCarlo *monteCarlo = new MonteCarlo((char *) "../data/basket.dat");
 
     double basketOptionPrice;
     double ic1;
@@ -34,7 +34,7 @@ TEST_F(MonteCarloTest, test_price_basket_file){
 
 TEST_F(MonteCarloTest, test_price_basket1_file){
 
-    MonteCarlo *monteCarlo = new MonteCarlo((char *) "../../data/basket_1.dat");
+    MonteCarlo *monteCarlo = new MonteCarlo((char *) "../data/basket_1.dat");
 
     double basketOptionPrice;
     double ic1;
@@ -50,7 +50,7 @@ TEST_F(MonteCarloTest, test_price_basket1_file){
 
 TEST_F(MonteCarloTest, test_price_asian_file){
 
-    MonteCarlo *monteCarlo = new MonteCarlo((char *) "../../data/asian.dat");
+    MonteCarlo *monteCarlo = new MonteCarlo((char *) "../data/asian.dat");
 
     double asianOptionPrice;
     double ic1;
@@ -65,7 +65,7 @@ TEST_F(MonteCarloTest, test_price_asian_file){
 
 TEST_F(MonteCarloTest, test_price_perf_file){
 
-    MonteCarlo *monteCarlo = new MonteCarlo((char *) "../../data/perf.dat");
+    MonteCarlo *monteCarlo = new MonteCarlo((char *) "../data/perf.dat");
 
     double perfOptionPrice;
     double ic1;
@@ -80,7 +80,7 @@ TEST_F(MonteCarloTest, test_price_perf_file){
 
 /* Test options delta at t = 0 : */
 TEST_F(MonteCarloTest, test_delta_basket1_file){
-    MonteCarlo *monteCarlo = new MonteCarlo((char *) "../../data/basket_1.dat");
+    MonteCarlo *monteCarlo = new MonteCarlo((char *) "../data/basket_1.dat");
 
     int size = monteCarlo->mod_->size_;
     int nbTimeSteps = 1;
@@ -105,7 +105,7 @@ TEST_F(MonteCarloTest, test_delta_basket1_file){
 
 TEST_F(MonteCarloTest, test_delta_basket2_file){
 
-    MonteCarlo *monteCarlo = new MonteCarlo((char *) "../../data/basket_2.dat");
+    MonteCarlo *monteCarlo = new MonteCarlo((char *) "../data/basket_2.dat");
 
     int size = monteCarlo->mod_->size_;
     int nbTimeSteps = 1;
@@ -130,7 +130,7 @@ TEST_F(MonteCarloTest, test_delta_basket2_file){
 
 
 TEST_F(MonteCarloTest, test_delta_asian_file){
-    MonteCarlo *monteCarlo = new MonteCarlo((char *) "../../data/asian.dat");
+    MonteCarlo *monteCarlo = new MonteCarlo((char *) "../data/asian.dat");
     int size = monteCarlo->mod_->size_;
     int nbTimeSteps = 1;
     PnlVect *delta = pnl_vect_create_from_scalar(size, 1);
